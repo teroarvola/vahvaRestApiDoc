@@ -1,0 +1,57 @@
+
+<h2>NewCaseData</h2>
+<ul class="parameter">
+  <li class="param-required-true">language : Language
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">title : String
+    <br/>The title of the case. Must have 3 characters minimum
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">classificationCode : String
+    <br/>The classification code of the case
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">responsiblePerson : Agent
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">responsibleOrganization : Agent
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">contacts : List
+    <br/>case contacts identified by Contact.recno, if any
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">otherId : List
+    <br/>external IDs of the case, if any
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">restriction : RestrictionInfo
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">status : CaseStatus
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">retentionPeriod : Integer
+    <br/>SÄHKE2 2.11.1 Säilytysajan pituus, if not given TOS default will be used
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">retentionReason : String
+    <br/>SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used
+  </li>
+</ul>

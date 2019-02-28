@@ -1,0 +1,77 @@
+
+<h2>NewRecordData</h2>
+<ul class="parameter">
+  <li class="param-required-false">caseId : String
+    <br/>SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Case.recno. Pakollinen, jos asiakirja liitetään asiaan
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">taskType : ActionType
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentType : DocumentType
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">language : Language
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">title : String
+    <br/>The title of the document
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">responsiblePerson : Agent
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">responsibleOrganization : Agent
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">receiver : List
+    <br/>revceivers of record, identified by VAHVA Contact.recno, role in Agent
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">contact : List
+    <br/>all kinds of contacts except receivers (forInformation, document contact...), identified by VAHVA Contact.recno, role in Agent
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">otherId : List
+    <br/>external IDs of the document, if any
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">restriction : RestrictionInfo
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">status : DocumentStatus
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">retentionPeriod : Integer
+    <br/>SÄHKE2 2.11.1 Säilytysajan pituus, if not given then TOS default will be used
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">retentionReason : String
+    <br/>SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">document : List
+    <br/>the documents of the record - can be given at creation time, or later
+  </li>
+</ul>

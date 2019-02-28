@@ -1,0 +1,82 @@
+
+<h2>ListDocument</h2>
+<ul class="parameter">
+  <li class="param-required-true">documentType : String
+    <br/>VAHVA document type identifier.  
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentTypeNameFi : String
+    <br/>Written-out name of the document type in Finnish. It has been noted that these \&quot;publicity facing\&quot; document types should be written out using different document type names than those within VAHVA. 
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentTypeNameSv : String
+    <br/>Written-out name of the document type in Swedisah. 
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">listId : TechnicalId
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">containsPersonalData : Boolean
+    <br/>Indicates whether the document in question contains personal data or sensitive personal data (SÄHKE2 2.6.7)
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">ordinal : Integer
+    <br/>The ordinal number of the document in the case
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentId : TechnicalId
+    <br/>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentFormatType : String
+    <br/>* 1 - sähköinen versio / electronic document * 2 - ainoastaan paperilla / paper only 
+      <dl class="param-enum">
+        <dt>Enum:
+            <dd>1</dd>
+            <dd>2</dd>
+        </dt>
+      </dl>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">documentTitle : String
+    <br/>The name of the document
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">fileName : String
+    <br/>Name of the file, id + pdf
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-true">lang : String
+    <br/>2-letter ISO language code TODO Should be unified across all interfaces, put common types into imported file 
+      <dl class="param-enum">
+        <dt>Enum:
+            <dd>fi</dd>
+            <dd>sv</dd>
+            <dd>fr</dd>
+            <dd>en</dd>
+            <dd>de</dd>
+        </dt>
+      </dl>
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">correctionUnderway : Boolean
+    <br/>Indicates whether the a correction to the document is underway (but the list item decision  has still been written / \&quot;asia on päätöskirjattu\&quot;).  
+  </li>
+</ul>
+<ul class="parameter">
+  <li class="param-required-false">caseId : TechnicalId
+    <br/>
+  </li>
+</ul>
