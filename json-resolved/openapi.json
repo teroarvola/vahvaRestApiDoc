@@ -743,7 +743,7 @@
         }, {
           "name" : "creationDateTo",
           "in" : "query",
-          "description" : "Limit results to those whose creation timestamp is earlier than this date. Default is empty. Format is YYYY-DD-MM",
+          "description" : "Limit results to those whose creation timestamp is earlier than this date. Default is empty. Format is YYYY-MM-DD",
           "required" : false,
           "style" : "form",
           "explode" : true,
