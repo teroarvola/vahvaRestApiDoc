@@ -710,46 +710,46 @@
         }, {
           "name" : "modificationDateFrom",
           "in" : "query",
-          "description" : "Limit results to those whose modification timestamp is later than this timestamp. Default is empty.",
+          "description" : "Limit results to those whose modification timestamp is later than this timestamp. Default is empty. Format is YYYY-MM-DD",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date"
           }
         }, {
           "name" : "modificationDateTo",
           "in" : "query",
-          "description" : "Limit results to those whose modification timestamp is earlier than this timestamp. Default is empty.",
+          "description" : "Limit results to those whose modification timestamp is earlier than this timestamp. Default is empty. Format is YYYY-MM-DD",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date"
           }
         }, {
           "name" : "creationDateFrom",
           "in" : "query",
-          "description" : "Limit results to those whose  creation timestamp later than this timestamp. Default is empty.",
+          "description" : "Limit results to those whose  creation timestamp later than this timestamp. Default is empty. Format is YYYY-MM-DD",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date"
           }
         }, {
           "name" : "creationDateTo",
           "in" : "query",
-          "description" : "Limit results to those whose creation timestamp is earlier than this timestamp. Default is empty.",
+          "description" : "Limit results to those whose creation timestamp is earlier than this date. Default is empty. Format is YYYY-DD-MM",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "dat"
           }
         }, {
           "name" : "issuedDateFrom",
