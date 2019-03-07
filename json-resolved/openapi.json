@@ -692,7 +692,7 @@
         }, {
           "name" : "recordStatus",
           "in" : "query",
-          "description" : "List of record statuses allowed (according to coded value recordStatus). Results are filtered by given status codes.\nDefaults to empty.\n",
+          "description" : "List of record statuses allowed (according to recno value in recordStatus). Results are filtered by given status code technical ids (recno).\nDefaults to empty.\n",
           "required" : false,
           "style" : "form",
           "explode" : true,
