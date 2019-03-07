@@ -212,7 +212,7 @@
         }, {
           "name" : "caseStatus",
           "in" : "query",
-          "description" : "List of case status allowed (according to recno value in caseStatus). Results are filtered by given status code technical ids (recno).\nDefaults to empty.\n",
+          "description" : "List of case statuses allowed (according to recno value in caseStatus). Results are filtered by given status code technical ids (recno).\nDefaults to empty.\n",
           "required" : false,
           "style" : "form",
           "explode" : true,
