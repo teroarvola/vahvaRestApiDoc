@@ -22,7 +22,7 @@
           "explode" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole" ]
+            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole", "ministryCode" ]
           }
         }, {
           "name" : "lang",
@@ -2013,67 +2013,67 @@
       "VahvaContact" : {
         "type" : "object",
         "properties" : {
-          "contactType" : {
+          "ContactType" : {
             "$ref" : "#/components/schemas/VahvaContactType"
           },
-          "name" : {
+          "Name" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.SearchName"
           },
-          "recno" : {
+          "Recno" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Recno"
           },
-          "externalId" : {
+          "ExternalId" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.ExternalID"
           },
-          "active" : {
+          "Active" : {
             "type" : "boolean",
             "description" : "Whether the contact is active or not, Tieto 360 Contact.ActiveContact"
           },
-          "phoneNumber" : {
+          "PhoneNumber" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Teleobject1"
           },
-          "mobilePhone" : {
+          "MobilePhone" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Teleobject27"
           },
-          "email" : {
+          "Email" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Teleobject6"
           },
-          "firstName" : {
+          "FirstName" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Name2, used for persons"
           },
-          "lastName" : {
+          "LastName" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Name3, used for persons"
           },
-          "title" : {
+          "Title" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.Title, used for persons"
           },
-          "addresses" : {
+          "Addresses" : {
             "type" : "array",
             "description" : "contact's addresses",
             "items" : {
               "$ref" : "#/components/schemas/Address"
             }
           },
-          "created" : {
+          "Created" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.CreatedDate",
             "format" : "date-time"
           },
-          "modified" : {
+          "Modified" : {
             "type" : "string",
             "description" : "Tieto 360 Contact.ModifiedDate",
             "format" : "date-time"
           },
-          "categories" : {
+          "Categories" : {
             "type" : "array",
             "description" : "Tieto 360 Contact Categories",
             "items" : {
@@ -2100,73 +2100,72 @@
       "Address" : {
         "type" : "object",
         "properties" : {
-          "addressType" : {
+          "AddressType" : {
             "$ref" : "#/components/schemas/VahvaAddressType"
           },
-          "streetAddress" : {
+          "StreetAddress" : {
             "type" : "string",
             "description" : "Tieto 360 Address.Address"
           },
-          "zipCode" : {
+          "ZipCode" : {
             "type" : "string",
             "description" : "Tieto 360 Address.ZipCode"
           },
-          "postOffice" : {
+          "PostOffice" : {
             "type" : "string",
             "description" : "Tieto 360 Address.ZipPlace"
           },
-          "country" : {
+          "Country" : {
             "type" : "string",
             "description" : "Tieto 360 Address.Country (either text or 3-number ISO country code)"
           }
         }
       },
       "NewCaseData" : {
-        "required" : [ "classificationCode", "language", "responsibleOrganization", "responsiblePerson", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "language" : {
+          "Language" : {
             "$ref" : "#/components/schemas/Language"
           },
-          "title" : {
+          "Title" : {
             "type" : "string",
             "description" : "The title of the case. Must have 3 characters minimum"
           },
-          "classificationCode" : {
+          "ClassificationCode" : {
             "type" : "string",
             "description" : "The classification code of the case"
           },
-          "responsiblePerson" : {
+          "ResponsiblePerson" : {
             "$ref" : "#/components/schemas/Agent"
           },
-          "responsibleOrganization" : {
+          "ResponsibleOrganization" : {
             "$ref" : "#/components/schemas/Agent"
           },
-          "contacts" : {
+          "Contacts" : {
             "type" : "array",
             "description" : "case contacts identified by Contact.recno, if any",
             "items" : {
               "$ref" : "#/components/schemas/Agent"
             }
           },
-          "otherId" : {
+          "OtherId" : {
             "type" : "array",
             "description" : "external IDs of the case, if any",
             "items" : {
               "$ref" : "#/components/schemas/OtherId"
             }
           },
-          "restriction" : {
+          "Restriction" : {
             "$ref" : "#/components/schemas/RestrictionInfo"
           },
-          "status" : {
+          "Status" : {
             "$ref" : "#/components/schemas/CaseStatus"
           },
-          "retentionPeriod" : {
+          "RetentionPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.11.1 Säilytysajan pituus, if not given TOS default will be used"
           },
-          "retentionReason" : {
+          "RetentionReason" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used"
           }
@@ -2174,68 +2173,67 @@
         "description" : "Information needed to create a case"
       },
       "NewRecordData" : {
-        "required" : [ "documentType", "language", "receiver", "responsibleOrganization", "responsiblePerson", "restriction", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "caseId" : {
+          "CaseId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Case.recno. Pakollinen, jos asiakirja liitetään asiaan"
           },
-          "taskType" : {
+          "TaskType" : {
             "$ref" : "#/components/schemas/ActionType"
           },
-          "documentType" : {
+          "DocumentType" : {
             "$ref" : "#/components/schemas/DocumentType"
           },
-          "language" : {
+          "Language" : {
             "$ref" : "#/components/schemas/Language"
           },
-          "title" : {
+          "Title" : {
             "type" : "string",
             "description" : "The title of the document"
           },
-          "responsiblePerson" : {
+          "ResponsiblePerson" : {
             "$ref" : "#/components/schemas/Agent"
           },
-          "responsibleOrganization" : {
+          "ResponsibleOrganization" : {
             "$ref" : "#/components/schemas/Agent"
           },
-          "receiver" : {
+          "Receiver" : {
             "type" : "array",
             "description" : "revceivers of record, identified by VAHVA Contact.recno, role in Agent",
             "items" : {
               "$ref" : "#/components/schemas/Agent"
             }
           },
-          "contact" : {
+          "Contact" : {
             "type" : "array",
             "description" : "all kinds of contacts except receivers (forInformation, document contact...), identified by VAHVA Contact.recno, role in Agent",
             "items" : {
               "$ref" : "#/components/schemas/Agent"
             }
           },
-          "otherId" : {
+          "OtherId" : {
             "type" : "array",
             "description" : "external IDs of the document, if any",
             "items" : {
               "$ref" : "#/components/schemas/OtherId"
             }
           },
-          "restriction" : {
+          "Restriction" : {
             "$ref" : "#/components/schemas/RestrictionInfo"
           },
-          "status" : {
+          "Status" : {
             "$ref" : "#/components/schemas/DocumentStatus"
           },
-          "retentionPeriod" : {
+          "RetentionPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.11.1 Säilytysajan pituus, if not given then TOS default will be used"
           },
-          "retentionReason" : {
+          "RetentionReason" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used"
           },
-          "document" : {
+          "Document" : {
             "type" : "array",
             "description" : "the documents of the record - can be given at creation time, or later",
             "items" : {
@@ -2246,14 +2244,13 @@
         "description" : "Tiedot joita tarvitaan asiakirjan luomiseen. Asiakirjan luomisen yhteydessä voidaan antaa myös asiakirjan tiedostot, tai ne voidaan ladata myöhemmin\n"
       },
       "NewDocumentData" : {
-        "required" : [ "document", "recordId" ],
         "type" : "object",
         "properties" : {
-          "recordId" : {
+          "RecordId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Document.recno."
           },
-          "document" : {
+          "Document" : {
             "type" : "array",
             "description" : "the document(s) to add to the record",
             "items" : {
@@ -2264,13 +2261,12 @@
         "description" : "Tiedot joita tarvitaan tiedoston/tiedostojen liittämiseen asiakirjaan\n"
       },
       "NewDocument" : {
-        "required" : [ "documentContents", "sahkeDocument" ],
         "type" : "object",
         "properties" : {
-          "sahkeDocument" : {
+          "SahkeDocument" : {
             "$ref" : "#/components/schemas/NewSahkeDocument"
           },
-          "documentContents" : {
+          "DocumentContents" : {
             "type" : "string",
             "format" : "binary"
           }
@@ -2278,47 +2274,46 @@
         "description" : "SÄHKE2 6.4.2 Tiedosto + tiedoston sisältö"
       },
       "NewSahkeDocument" : {
-        "required" : [ "formatName", "hashAlgorithm", "hashValue", "useType" ],
         "type" : "object",
         "properties" : {
-          "nativeId" : {
+          "NativeId" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.1 Identifiointitunnus (VAHVA Document recno)"
           },
-          "useType" : {
+          "UseType" : {
             "type" : "string",
             "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
             "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
           },
-          "fileName" : {
+          "FileName" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.2.1 (tiedoston) Nimi"
           },
-          "filePath" : {
+          "FilePath" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.2.2 Hakemistopolku"
           },
-          "formatName" : {
+          "FormatName" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.3.1 (formaatin) Nimi"
           },
-          "formatVersion" : {
+          "FormatVersion" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.3.2 (formaatin) Versio (NOT IMPLEMENTED)"
           },
-          "mediumId" : {
+          "MediumId" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.4 Median identifiointitunnus (NOT IMPLEMENTED)"
           },
-          "hashAlgorithm" : {
+          "HashAlgorithm" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi"
           },
-          "hashValue" : {
+          "HashValue" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo"
           },
-          "encryption" : {
+          "Encryption" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.7 Salaustapa (NOT IMPLEMENTED)"
           }
@@ -2328,7 +2323,7 @@
       "ErrorInfo" : {
         "type" : "object",
         "properties" : {
-          "errors" : {
+          "Errors" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/Error"
@@ -2339,27 +2334,26 @@
       "Error" : {
         "type" : "object",
         "properties" : {
-          "errorCode" : {
+          "ErrorCode" : {
             "type" : "string"
           },
-          "errorMessage" : {
+          "ErrorMessage" : {
             "type" : "string"
           }
         },
         "description" : "Indicates that transaction was not completed, and the reason for this"
       },
       "Case" : {
-        "required" : [ "action", "agent", "classificationCode", "created", "function", "language", "nativeId", "restriction", "retentionPeriod", "retentionPeriodCalculationGrounds", "retentionReason", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "subject" : {
+          "Subject" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 2.1 Aihe (Subject) as URI of the subject in e.g YSO or JUHO"
             }
           },
-          "created" : {
+          "Created" : {
             "type" : "array",
             "items" : {
               "type" : "string",
@@ -2383,7 +2377,7 @@
               "format" : "date-time"
             }
           },
-          "modified" : {
+          "Modified" : {
             "type" : "array",
             "items" : {
               "type" : "string",
@@ -2407,111 +2401,111 @@
               "format" : "date-time"
             }
           },
-          "caseNumber" : {
+          "CaseNumber" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 Identifiointitunnus, VAHVAn asianumero"
           },
-          "nativeId" : {
+          "NativeId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 Identifiointitunnus, VAHVA case.recno"
           },
-          "otherId" : {
+          "OtherId" : {
             "type" : "array",
             "description" : "Asian tunnisteet muissa järjestelmissä",
             "items" : {
               "$ref" : "#/components/schemas/OtherId"
             }
           },
-          "language" : {
+          "Language" : {
             "type" : "array",
             "description" : "SÄHKE2 2.4 (asian) Kieli",
             "items" : {
               "$ref" : "#/components/schemas/Language"
             }
           },
-          "description" : {
+          "Description" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE 5.2 (asian) Kuvaus"
             }
           },
-          "abstract" : {
+          "Abstract" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE 2.5.1 (asian) Tiivistelmä"
             }
           },
-          "restriction" : {
+          "Restriction" : {
             "$ref" : "#/components/schemas/RestrictionInfo"
           },
-          "title" : {
+          "Title" : {
             "type" : "string",
             "description" : "SÄHKE2 2.7 Nimike"
           },
-          "caseFileRelation" : {
+          "CaseFileRelation" : {
             "type" : "array",
             "description" : "SÄHKE2 2.10 Suhde NOT IMPLEMENTED",
             "items" : {
               "$ref" : "#/components/schemas/CaseFileRelation"
             }
           },
-          "retentionPeriod" : {
+          "RetentionPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.11.1 Säilytysajan pituus"
           },
-          "retentionReason" : {
+          "RetentionReason" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.2 Säilytysajan peruste"
           },
-          "retentionPeriodEnd" : {
+          "RetentionPeriodEnd" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta"
           },
-          "retentionPeriodCalculationGrounds" : {
+          "RetentionPeriodCalculationGrounds" : {
             "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
           },
-          "status" : {
+          "Status" : {
             "$ref" : "#/components/schemas/CaseStatus"
           },
-          "classificationCode" : {
+          "ClassificationCode" : {
             "type" : "string",
             "description" : "Shorthand of the classification code, such as \"03.02.01.01.00\""
           },
-          "classificationScheme" : {
+          "ClassificationScheme" : {
             "$ref" : "#/components/schemas/ClassificationScheme"
           },
-          "function" : {
+          "Function" : {
             "type" : "string",
             "description" : "SÄHKE2 2.13 Tehtävä"
           },
-          "agent" : {
+          "Agent" : {
             "type" : "array",
             "description" : "SÄHKE2 2.14 Toimija",
             "items" : {
               "$ref" : "#/components/schemas/Agent"
             }
           },
-          "type" : {
+          "Type" : {
             "$ref" : "#/components/schemas/CaseType"
           },
-          "finished" : {
+          "Finished" : {
             "type" : "string",
             "description" : "SÄHKE2 3.1.1 Päättymispvm (NOT IMPLEMENTED)",
             "format" : "date"
           },
-          "electronicNotification" : {
+          "ElectronicNotification" : {
             "$ref" : "#/components/schemas/ElectronicNotification"
           },
-          "action" : {
+          "Action" : {
             "type" : "array",
             "description" : "Asiaan liittyvät toimenpiteet",
             "items" : {
               "$ref" : "#/components/schemas/Action"
             }
           },
-          "custom" : {
+          "Custom" : {
             "type" : "array",
             "description" : "SÄHKE2 2.8 Organisaatiokohtaiset metatiedot",
             "items" : {
@@ -2605,17 +2599,16 @@
         "description" : "SÄHKE2 5 Toimenpide. Note that there is no separate \"Task\" entity in P360. \"Task\" is actually two pieces of custom metadata in Document object, namely \"Toimenpiteen nimeke\" (such as \"Kanslaiskirjeen vastaanottaminen\" - SÄHKE2 5.3 ) and \"Toimenpiteen tyyppi\" (such as \"06.04.07.00\" - SÄHKE2 5.6). This has a number of consequences * Each Action only has one Record * There can be multiple Actions of the same action type in Case * Some Action data is actually Record data (such as agent) * Only mandatory SÄHKE2 fields are used\n"
       },
       "Record" : {
-        "required" : [ "authenticity", "created", "function", "language", "nativeId", "restriction", "status", "title", "type" ],
         "type" : "object",
         "properties" : {
-          "subject" : {
+          "Subject" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 2.1 (asiakirjan) Aihe"
             }
           },
-          "created" : {
+          "Created" : {
             "type" : "array",
             "items" : {
               "type" : "string",
@@ -2639,7 +2632,7 @@
               "format" : "date-time"
             }
           },
-          "modified" : {
+          "Modified" : {
             "type" : "array",
             "items" : {
               "type" : "string",
@@ -2663,17 +2656,17 @@
               "format" : "date-time"
             }
           },
-          "nativeId" : {
+          "NativeId" : {
             "type" : "string",
             "description" : "SÄHKE 2.3 (asiakirjan) Identifiointitunnus, VAHVA document.recno"
           },
-          "otherId" : {
+          "OtherId" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/OtherId"
             }
           },
-          "language" : {
+          "Language" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/Language"
@@ -2693,46 +2686,46 @@
               "description" : "SÄHKE 2.5.1 (asiakirjan) Tiivistelmä (NOT IMPLEMENTED)"
             }
           },
-          "restriction" : {
+          "Restriction" : {
             "$ref" : "#/components/schemas/RestrictionInfo"
           },
-          "title" : {
+          "Title" : {
             "type" : "string",
             "description" : "SÄHKE 2.7 (asiakirjan) Nimike"
           },
-          "storageLocation" : {
+          "StorageLocation" : {
             "type" : "string",
             "description" : "SÄHKE2 2.9 (asiakirjan) Sijaintipaikka"
           },
-          "recordRelations" : {
+          "RecordRelations" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/RecordRelation"
             }
           },
-          "retentionPeriod" : {
+          "RetentionPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.11.1 Säilytysajan pituus"
           },
-          "retentionReason" : {
+          "RetentionReason" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.2 Säilytysajan peruste"
           },
-          "retentionPeriodEnd" : {
+          "RetentionPeriodEnd" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta"
           },
-          "retentionPeriodCalculationGrounds" : {
+          "RetentionPeriodCalculationGrounds" : {
             "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
           },
-          "status" : {
+          "Status" : {
             "$ref" : "#/components/schemas/DocumentStatus"
           },
-          "function" : {
+          "Function" : {
             "type" : "string",
             "description" : "SÄHKE2 2.13 Tehtävä"
           },
-          "type" : {
+          "Type" : {
             "$ref" : "#/components/schemas/DocumentType"
           },
           "accepted" : {
@@ -2745,17 +2738,17 @@
             "description" : "SÄHKE2 4.1.2 Koottu pvm (NOT IMPLEMENTED)",
             "format" : "date"
           },
-          "valid" : {
+          "Valid" : {
             "$ref" : "#/components/schemas/TimePeriod"
           },
-          "authenticity" : {
+          "Authenticity" : {
             "$ref" : "#/components/schemas/Authenticity"
           },
           "signatureDescription" : {
             "type" : "string",
             "description" : "SÄHKE2 4.3 Asiakirjan sähköinen allekirjoitus (NOT IMPLEMENTED)"
           },
-          "coverage" : {
+          "Coverage" : {
             "$ref" : "#/components/schemas/Coverage"
           },
           "audience" : {
@@ -2779,39 +2772,39 @@
               "description" : "SÄHKE2 4.7 Oikeudet (NOT IMPLEMENTED)"
             }
           },
-          "protectionClass" : {
+          "ProtectionClass" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 4.9 Suojeluluokka"
             }
           },
-          "alternativeTitle" : {
+          "AlternativeTitle" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 4.10 Vaihtoehtoinen nimike"
             }
           },
-          "version" : {
+          "Version" : {
             "type" : "string",
             "description" : "SÄHKE2 4.11 Versio"
           },
-          "document" : {
+          "Document" : {
             "type" : "array",
             "description" : "SÄHKE2 6.4.2 Tiedosto",
             "items" : {
               "$ref" : "#/components/schemas/Document"
             }
           },
-          "custom" : {
+          "Custom" : {
             "type" : "array",
             "description" : "SÄHKE2 2.8 (asiakirjan) Organisaatiokohtaiset metatiedot",
             "items" : {
               "$ref" : "#/components/schemas/CustomMetadata"
             }
           },
-          "agent" : {
+          "Agent" : {
             "type" : "array",
             "description" : "SÄHKE2 2.14 Toimija",
             "items" : {
@@ -2849,19 +2842,18 @@
         "description" : "SÄHKE2 4.4 Kattavauus (NOT IMPLEMENTED)"
       },
       "Authenticity" : {
-        "required" : [ "checker", "date", "description" ],
         "type" : "object",
         "properties" : {
-          "checker" : {
+          "Checker" : {
             "type" : "string",
             "description" : "SÄHKE2 4.2.1 Tarkastaja"
           },
-          "date" : {
+          "Date" : {
             "type" : "string",
             "description" : "SÄHKE2 4.2.2 Aikamääre",
             "format" : "date"
           },
-          "description" : {
+          "Description" : {
             "type" : "string",
             "description" : "SÄHKE2 4.2.3 Kuvaus"
           }
@@ -2869,15 +2861,14 @@
         "description" : "SÄHKE2 4.2 Asiakirjan alkuperäisyys ja eheys todettu"
       },
       "TimePeriod" : {
-        "required" : [ "start" ],
         "type" : "object",
         "properties" : {
-          "start" : {
+          "Start" : {
             "type" : "string",
             "description" : "Ajanjakson alku",
             "format" : "date"
           },
-          "end" : {
+          "End" : {
             "type" : "string",
             "description" : "Ajanjakon loppu",
             "format" : "date"
@@ -2948,27 +2939,26 @@
         "description" : "SÄHKE2 4.8 Suhde (NOT IMPLEMENTED)"
       },
       "SahkeDocument" : {
-        "required" : [ "formatName", "hashAlgorithm", "hashValue", "nativeId", "useType" ],
         "type" : "object",
         "properties" : {
-          "nativeId" : {
+          "NativeId" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.1 Identifiointitunnus (VAHVA Document recno)"
           },
-          "useType" : {
+          "UseType" : {
             "type" : "string",
             "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
             "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
           },
-          "fileName" : {
+          "FileName" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.2.1 (tiedoston) Nimi"
           },
-          "filePath" : {
+          "FilePath" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.2.2 Hakemistopolku"
           },
-          "formatName" : {
+          "FormatName" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.3.1 (formaatin) Nimi"
           },
@@ -2980,11 +2970,11 @@
             "type" : "string",
             "description" : "SÄHKE2 6.4.4 Median identifiointitunnus (NOT IMPLEMENTED)"
           },
-          "hashAlgorithm" : {
+          "HashAlgorithm" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi"
           },
-          "hashValue" : {
+          "HashValue" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo"
           },
@@ -2996,13 +2986,12 @@
         "description" : "SÄHKE2 6.4.2 Tiedosto"
       },
       "Document" : {
-        "required" : [ "documentContents", "sahkeDocument" ],
         "type" : "object",
         "properties" : {
-          "sahkeDocument" : {
+          "SahkeDocument" : {
             "$ref" : "#/components/schemas/SahkeDocument"
           },
-          "documentContents" : {
+          "DocumentContents" : {
             "type" : "string",
             "format" : "binary"
           }
@@ -3047,21 +3036,21 @@
       "ClassificationScheme" : {
         "type" : "object",
         "properties" : {
-          "mainFunction" : {
+          "MainFunction" : {
             "$ref" : "#/components/schemas/FunctionCode"
           },
-          "functionClassifiction" : {
-            "$ref" : "#/components/schemas/ClassificationScheme_functionClassifiction"
+          "FunctionClassifiction" : {
+            "$ref" : "#/components/schemas/ClassificationScheme_FunctionClassifiction"
           }
         }
       },
       "FunctionClassification" : {
         "type" : "object",
         "properties" : {
-          "function" : {
+          "Function" : {
             "$ref" : "#/components/schemas/FunctionCode"
           },
-          "subFunctions" : {
+          "SubFunctions" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/SubFunction"
@@ -3072,11 +3061,11 @@
       "FunctionCode" : {
         "type" : "object",
         "properties" : {
-          "functionTitle" : {
+          "FunctionTitle" : {
             "type" : "string",
             "description" : "SÄHKE2 6.3.5 Nimeke"
           },
-          "functionCode" : {
+          "FunctionCode" : {
             "type" : "string",
             "description" : "SÄHKE2 6.3.4 Tunnus"
           }
@@ -3085,10 +3074,10 @@
       "SubFunction" : {
         "type" : "object",
         "properties" : {
-          "function" : {
+          "Function" : {
             "$ref" : "#/components/schemas/FunctionCode"
           },
-          "subFunctions" : {
+          "SubFunctions" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/SubFunction"
@@ -3099,19 +3088,19 @@
       "CaseFileRelation" : {
         "type" : "object",
         "properties" : {
-          "replaces" : {
+          "Replaces" : {
             "type" : "string",
             "description" : "SÄHKE2 2.10.1 Korvaa/Korvattu"
           },
-          "isReplacedBy" : {
+          "IsReplacedBy" : {
             "type" : "string",
             "description" : "SÄHKE2 2.10.1 Korvaa/Korvattu"
           },
-          "references" : {
+          "References" : {
             "type" : "string",
             "description" : "SÄHKE2 2.10.1 2.10.2 Viittaa/On viitattu"
           },
-          "isReferencedBy" : {
+          "IsReferencedBy" : {
             "type" : "string",
             "description" : "SÄHKE2 2.10.1 2.10.2 Viittaa/On viitattu"
           }
@@ -3119,40 +3108,38 @@
         "description" : "SÄHKE2 2.10 Suhde"
       },
       "Agent" : {
-        "required" : [ "role" ],
         "type" : "object",
         "properties" : {
-          "role" : {
+          "Role" : {
             "$ref" : "#/components/schemas/AgentRole"
           },
-          "name" : {
+          "Name" : {
             "type" : "string",
             "description" : "SÄHKE2 2.14.2 Henkilö"
           },
-          "corporateName" : {
+          "CorporateName" : {
             "type" : "string",
             "description" : "SÄHKE2 2.14.3 Yhteisö"
           },
-          "otherId" : {
+          "OtherId" : {
             "$ref" : "#/components/schemas/OtherId"
           }
         },
         "description" : "SÄHKE2 2.14 Toimija + laajennettu OtherId -tiedolla"
       },
       "CustomMetadata" : {
-        "required" : [ "name", "type", "value" ],
         "type" : "object",
         "properties" : {
-          "name" : {
+          "Name" : {
             "type" : "string",
             "description" : "metadata name"
           },
-          "type" : {
+          "Type" : {
             "type" : "string",
             "description" : "metadata type",
             "enum" : [ "string", "integer", "date" ]
           },
-          "value" : {
+          "Value" : {
             "type" : "string",
             "description" : "metadata value"
           }
@@ -3189,89 +3176,87 @@
       "RestrictedPerson" : {
         "type" : "object",
         "properties" : {
-          "name" : {
+          "Name" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.8.1 Nimi"
           },
-          "ssn" : {
+          "Ssn" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.8.2 Henkilötunnus",
             "format" : "hetu"
           },
-          "electronicId" : {
+          "ElectronicId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.8.3 Sähköinen asiointitunnus"
           }
         }
       },
       "AccessRight" : {
-        "required" : [ "name", "role" ],
         "type" : "object",
         "properties" : {
-          "name" : {
+          "Name" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.10.1 Henkilö"
           },
-          "role" : {
+          "Role" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.10.2 Rooli"
           },
-          "accessRightDescription" : {
+          "AccessRightDescription" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.10.3 Kuvaus"
           }
         }
       },
       "RestrictionInfo" : {
-        "required" : [ "containsPersonalData", "publicityClass" ],
         "type" : "object",
         "properties" : {
-          "publicityClass" : {
+          "PublicityClass" : {
             "$ref" : "#/components/schemas/PublicityClass"
           },
-          "publicityClassChange" : {
+          "PublicityClassChange" : {
             "$ref" : "#/components/schemas/PublicityClassChange"
           },
-          "securityPeriod" : {
+          "SecurityPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.6.2 Salassapitoaika"
           },
-          "securityPeriodEnd" : {
+          "SecurityPeriodEnd" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.3 Salassapidon päättymisajankohta",
             "format" : "date"
           },
-          "securityReson" : {
+          "SecurityReson" : {
             "type" : "string",
             "description" : "SÄHKE2 2.6.4 Salasspitoperuste"
           },
-          "securityPeriodCalculationGrounds" : {
+          "SecurityPeriodCalculationGrounds" : {
             "type" : "string",
             "description" : "JHS191 5.4 Salassapidon laskentaperuste. Mandatory if not public."
           },
-          "protectionLevel" : {
+          "ProtectionLevel" : {
             "$ref" : "#/components/schemas/ProtectionLevel"
           },
-          "securityClass" : {
+          "SecurityClass" : {
             "$ref" : "#/components/schemas/SecurityClass"
           },
-          "containsPersonalData" : {
+          "ContainsPersonalData" : {
             "$ref" : "#/components/schemas/PersonalDataNature"
           },
-          "persons" : {
+          "Persons" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/RestrictedPerson"
             }
           },
-          "owners" : {
+          "Owners" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 2.6.9 Omistaja"
             }
           },
-          "accessRights" : {
+          "AccessRights" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/AccessRight"
@@ -3283,20 +3268,20 @@
       "Code" : {
         "type" : "object",
         "properties" : {
-          "lang" : {
+          "Lang" : {
             "type" : "string",
             "description" : "language of the code, ISO 2-letter language code",
             "enum" : [ "fi", "sv", "en" ]
           },
-          "recno" : {
+          "Recno" : {
             "type" : "string",
             "description" : "technical id of the code requested."
           },
-          "code" : {
+          "Code" : {
             "type" : "string",
             "description" : "code itself"
           },
-          "description" : {
+          "Description" : {
             "type" : "string",
             "description" : "human-readable description in the specified langauage"
           }
@@ -3306,11 +3291,11 @@
       "OtherId" : {
         "type" : "object",
         "properties" : {
-          "otherIdType" : {
+          "OtherIdType" : {
             "type" : "string",
             "description" : "Koodiston \"otherIdType\" mukaiset vaihtoehdot. VNK-esimerkki\n* vahvaDocumentNumber\n* eduskuntaTunnus\n* vahvaContactRecno\n* hankeikkunaKohdeTunnus\n* unspecified\n"
           },
-          "otherId" : {
+          "OtherId" : {
             "type" : "string"
           }
         }
@@ -3332,20 +3317,19 @@
         "description" : "JHS191 6.3 Käsittelyprosessin tila. Coded value \"actionStatus\". VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* \"Avattu\"\n* \"Vireillä\"\n* \"Valmistelussa\"\n* \"Ratkaistu\" \n* \"Toimitettu tiedoksi\"\n* \"Toimeenpantavana\" \n* \"Muutoksenhaku\"\n* \"Seurannassa\"\n* \"Päätetty\" \n* \"Avattu uudelleen\" \n* \"Siirretty\" \n* \"Hävitetty\"\n"
       },
       "DocumentType" : {
-        "required" : [ "typeCode" ],
         "type" : "object",
         "properties" : {
-          "type" : {
+          "Type" : {
             "type" : "string",
             "description" : "SÄHKE2 2.15 (asiakirjan) Tyyppi",
             "example" : "Kannanotto"
           },
-          "typeSpecifier" : {
+          "TypeSpecifier" : {
             "type" : "string",
             "description" : "JHS 191 asiakirjatyypin tarkenne",
             "example" : "Neuvoteltu VM:n kanta"
           },
-          "typeCode" : {
+          "TypeCode" : {
             "type" : "string",
             "description" : "dokumenttityypin koodi",
             "example" : "09.00.00.00.06.01"
@@ -3370,155 +3354,153 @@
         "description" : "Technical ID (recno) in VAHVA"
       },
       "Session" : {
-        "required" : [ "changedTime", "extra", "place", "plannedStart", "removed", "sessionIdentifier", "status" ],
         "type" : "object",
         "properties" : {
           "sessionId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           },
-          "plannedStart" : {
+          "PlannedStart" : {
             "type" : "string",
             "description" : "Planned start of the session",
             "format" : "datetime"
           },
-          "actualStart" : {
+          "ActualStart" : {
             "type" : "string",
             "description" : "Actual start of the session",
             "format" : "datetime"
           },
-          "place" : {
+          "Place" : {
             "maxLength" : 100,
             "type" : "string",
             "description" : "Place of the session",
             "example" : "[Helsinki, Naantali]"
           },
-          "type" : {
+          "Type" : {
             "$ref" : "#/components/schemas/SessionType"
           },
-          "status" : {
+          "Status" : {
             "$ref" : "#/components/schemas/SessionStatus"
           },
-          "extra" : {
+          "Extra" : {
             "type" : "boolean",
             "description" : "Indicated wheter session is scheduled or and extra session"
           },
-          "sessionIdentifier" : {
+          "SessionIdentifier" : {
             "maxLength" : 32,
             "type" : "string",
             "description" : "Session identifier",
             "example" : "29/1995"
           },
-          "changedTime" : {
+          "ChangedTime" : {
             "type" : "string",
             "description" : "Last update timestamp",
             "format" : "datetime"
           },
-          "removed" : {
+          "Removed" : {
             "type" : "boolean",
             "description" : "True, is the session has been deleted, false otherwise"
           }
         }
       },
       "ListItem" : {
-        "required" : [ "caseId", "caseTypeName", "contents", "listStatus", "minister", "ministryName", "ministryShortName", "presenter", "proposal", "sessionId", "titleFi", "titleSv" ],
         "type" : "object",
         "properties" : {
-          "caseId" : {
+          "CaseId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           },
-          "caseTypeName" : {
+          "CaseTypeName" : {
             "type" : "string",
             "description" : "Case type written out",
             "example" : "Hallituksen esitys"
           },
-          "parliamentId" : {
+          "pParliamentId" : {
             "type" : "string",
             "description" : "Parliament id, if any",
             "example" : "HE 17/2018"
           },
-          "presenter" : {
+          "Presenter" : {
             "$ref" : "#/components/schemas/PersonInfo"
           },
-          "proposal" : {
+          "Proposal" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Presenter's propsal for approval",
             "example" : "Esitetään asian hyväksymistä / Approval is proposed"
           },
-          "sessionId" : {
+          "SessionId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           },
-          "additionalInfo" : {
+          "AdditionalInfo" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Any additional info for the list item",
             "example" : "Esitetään asian hyväksymistä / Approval is proposed"
           },
-          "listItemId" : {
+          "ListItemId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           },
-          "minister" : {
+          "Minister" : {
             "$ref" : "#/components/schemas/MinisterInfo"
           },
-          "ministryName" : {
+          "MinistryName" : {
             "maxLength" : 255,
             "type" : "string",
             "description" : "The full name of the presenters' ministry",
             "example" : "Opetus- ja kulttuuriministeriö / Ministry of Education and Culture"
           },
-          "ministryShortName" : {
+          "MinistryShortName" : {
             "maxLength" : 10,
             "type" : "string",
             "description" : "The abbreviation of the presenters' ministry",
             "example" : "OKM"
           },
-          "titleFi" : {
+          "TitleFi" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "The title of the case in the list.",
             "example" : "Hallituksen esitys mustikkalaista"
           },
-          "additionalDecisionInfo" : {
+          "AdditionalDecisionInfo" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Additional info regarding the decision taken. After the case has been handled (status = written or above) contains the name of the decision, too.",
             "example" : "Tasavallan presidentti hyväksyi esityksen"
           },
-          "decisionName" : {
+          "DecisionName" : {
             "maxLength" : 100,
             "type" : "string",
             "description" : "The written out decision code",
             "example" : "Tasavallan presidentti hyväksyi esityksen"
           },
-          "titleSv" : {
+          "TitleSv" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Title of the list item in Swedish"
           },
-          "contents" : {
+          "Contents" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "The contents of the list item"
           },
-          "listStatus" : {
+          "ListStatus" : {
             "$ref" : "#/components/schemas/ListStatus"
           },
-          "jurisdiction" : {
+          "Jurisdiction" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Jurisdiction related to the list item"
           },
-          "effects" : {
+          "Effects" : {
             "maxLength" : 2000,
             "type" : "string",
             "description" : "Effects of the case"
           },
-          "publicEmbargo" : {
+          "PublicEmbargo" : {
             "type" : "string",
             "description" : "Indicates the time when the list item can be made public.\n",
             "format" : "datetime"
           },
-          "documents" : {
+          "Documents" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/ListDocument"
@@ -3553,15 +3535,15 @@
       "FileInfo" : {
         "type" : "object",
         "properties" : {
-          "documentId" : {
+          "DocumentId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           },
-          "fileName" : {
+          "FileName" : {
             "type" : "string",
             "description" : "The name of the file",
             "example" : "vnl_vnksarlin.jpg"
           },
-          "mimeType" : {
+          "MimeType" : {
             "type" : "string",
             "description" : "MIME type of the file",
             "example" : "image/jpeg"
@@ -3569,14 +3551,14 @@
         }
       },
       "ListDocument" : {
-        "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentType", "documentTypeNameFi", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
+        "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
         "type" : "object",
         "properties" : {
-          "documentType" : {
+          "DocumentType" : {
             "type" : "string",
             "description" : "VAHVA document type identifier. \n"
           },
-          "documentTypeNameFi" : {
+          "DocumentTypeNameFi" : {
             "maxLength" : 255,
             "type" : "string",
             "description" : "Written-out name of the document type in Finnish. It has been noted that these \"publicity facing\" document types should\nbe written out using different document type names than those within VAHVA.\n",
@@ -3859,13 +3841,13 @@
           }
         }
       },
-      "ClassificationScheme_functionClassifiction" : {
+      "ClassificationScheme_FunctionClassifiction" : {
         "type" : "object",
         "properties" : {
-          "function" : {
+          "Function" : {
             "$ref" : "#/components/schemas/FunctionCode"
           },
-          "subFunctions" : {
+          "SubFunctions" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/SubFunction"
