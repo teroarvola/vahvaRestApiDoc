@@ -22,7 +22,7 @@
           "explode" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole", "ministryCode" ]
+            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole", "ministry" ]
           }
         }, {
           "name" : "lang",
