@@ -461,7 +461,7 @@
         }
       },
       "put" : {
-        "summary" : "Update case",
+        "summary" : "Update case (NOT IMPLEMENTED)",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -951,7 +951,7 @@
         }
       },
       "put" : {
-        "summary" : "Update record",
+        "summary" : "Update record (NOT IMPLEMENTED)",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1098,7 +1098,7 @@
     },
     "/api/v1/Documents" : {
       "put" : {
-        "summary" : "Add document to record",
+        "summary" : "Update document (NOT IMPLEMENTED)",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1110,7 +1110,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "Document inserted successfully",
+            "description" : "Document updated successfully, returns updated document",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1123,7 +1123,7 @@
             "description" : "unauthorized"
           },
           "405" : {
-            "description" : "Invalid input",
+            "description" : "Invalid input, such as trying to update fields that cannot be updated",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1145,7 +1145,7 @@
         }
       },
       "post" : {
-        "summary" : "Update document",
+        "summary" : "Add document to record",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1157,7 +1157,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "Document updated successfully, returns updated document",
+            "description" : "Document inserted successfully",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1170,7 +1170,7 @@
             "description" : "unauthorized"
           },
           "405" : {
-            "description" : "Invalid input, such as trying to update fields that cannot be updated",
+            "description" : "Invalid input",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1450,7 +1450,7 @@
     },
     "/api/v1/Classifications" : {
       "get" : {
-        "summary" : "Returns the whole classification scheme.",
+        "summary" : "Returns the whole classification scheme (NOT IMPLEMENTED)",
         "responses" : {
           "200" : {
             "description" : "Classification scheme",
@@ -1473,7 +1473,7 @@
     },
     "/api/v1/Functions/{functionCode}" : {
       "get" : {
-        "summary" : "Return function classification starting from a given function code. Note that the lowest level of function codes are actually the action types allowed in the function.\n",
+        "summary" : "Return function classification starting from a given function code. Note that the lowest level of function codes are actually the action types allowed in the function. (NOT IMPLEMENTED)\n",
         "parameters" : [ {
           "name" : "functionCode",
           "in" : "path",
@@ -1510,7 +1510,7 @@
     },
     "/api/v1/Documenttypes/{functionCode}" : {
       "get" : {
-        "summary" : "Return document types allowed for a given function code.\n",
+        "summary" : "Return document types allowed for a given function code. (NOT IMPLEMENTED)\n",
         "parameters" : [ {
           "name" : "functionCode",
           "in" : "path",
@@ -1550,7 +1550,7 @@
     },
     "/api/v1/Sessions" : {
       "get" : {
-        "summary" : "Fetch sessions",
+        "summary" : "Fetch sessions (NOT IMPLEMENTED)",
         "description" : "Find sessions possibly by type and date limits",
         "operationId" : "fetchSessions",
         "parameters" : [ {
@@ -1642,7 +1642,7 @@
     },
     "/api/v1/Lists" : {
       "get" : {
-        "summary" : "Fetch list items",
+        "summary" : "Fetch list items (NOT IMPLEMENTED)",
         "description" : "Fetch list items by session Id",
         "operationId" : "fetchList",
         "parameters" : [ {
@@ -1709,7 +1709,7 @@
     },
     "/api/v1/Listdocuments/{listItemId}" : {
       "get" : {
-        "summary" : "Fetch list item documents",
+        "summary" : "Fetch list item documents (NOT IMPLEMENTED)",
         "description" : "Fetch list item documents",
         "operationId" : "fetchListItemDocuments",
         "parameters" : [ {
@@ -1785,7 +1785,7 @@
     },
     "/api/v1/Sessiondocuments/{sessionId}" : {
       "get" : {
-        "summary" : "Fetch session documents",
+        "summary" : "Fetch session documents (NOT IMPLEMENTED)",
         "description" : "Fetch session document (that is, documents of list items of a session) by session id",
         "operationId" : "fetchSessionDocuments",
         "parameters" : [ {
@@ -1861,7 +1861,7 @@
     },
     "/api/v1/Listocumentids/{listItemId}" : {
       "get" : {
-        "summary" : "Fetch list item document ids so that each file can be fetched separately",
+        "summary" : "Fetch list item document ids so that each file can be fetched separately (NOT IMPLEMENTED)",
         "description" : "Fetch list item document ids by list item id",
         "operationId" : "fetchListItemDocumentsIds",
         "parameters" : [ {
@@ -1908,7 +1908,7 @@
     "/api/v1/Sessiondocumentids/{sessionId}" : {
       "get" : {
         "summary" : "Fetch session list item document ids so that each file can be fetched separately",
-        "description" : "Fetch session list item document ids by session id",
+        "description" : "Fetch session list item document ids by session id (NOT IMPLEMENTED)",
         "operationId" : "fetchSessionDocumentsIds",
         "parameters" : [ {
           "name" : "sessionId",
@@ -1953,7 +1953,7 @@
     },
     "/api/v1/Sessiondocuments/{documentId}" : {
       "get" : {
-        "summary" : "Fetch dession ocument",
+        "summary" : "Fetch dession document (NOT IMPLEMENTED)",
         "description" : "Fetch document by document id",
         "operationId" : "fetchDocument",
         "parameters" : [ {
@@ -3679,20 +3679,20 @@
         }
       },
       "body_4" : {
-        "required" : [ "newDocumentData" ],
-        "type" : "object",
-        "properties" : {
-          "newDocumentData" : {
-            "$ref" : "#/components/schemas/NewDocumentData"
-          }
-        }
-      },
-      "body_5" : {
         "required" : [ "documentData" ],
         "type" : "object",
         "properties" : {
           "documentData" : {
             "$ref" : "#/components/schemas/Document"
+          }
+        }
+      },
+      "body_5" : {
+        "required" : [ "newDocumentData" ],
+        "type" : "object",
+        "properties" : {
+          "newDocumentData" : {
+            "$ref" : "#/components/schemas/NewDocumentData"
           }
         }
       },
