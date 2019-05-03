@@ -3302,7 +3302,7 @@
       "TechnicalId" : {
         "maxLength" : 16,
         "type" : "string",
-        "description" : "Technical ID (recno) in VAHVA"
+        "description" : "Technical ID (recno) in VAHVA (NOT IMPLEMENTED)"
       },
       "Session" : {
         "type" : "object",
@@ -3351,7 +3351,8 @@
             "type" : "boolean",
             "description" : "True, is the session has been deleted, false otherwise"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "ListItem" : {
         "type" : "object",
@@ -3458,7 +3459,7 @@
             }
           }
         },
-        "description" : "Session list item information. The amount of information returned depends on list item state.\nIf list item state is 4 (decision written/päätöskirjattu), 5 (decision finalized/pöytäkirjattu) or 6 (decision checked/tarkistettu), full information is returned. Otherwise only the following is returned\n* caseId\n* presenter\n* sessionId\n* titleFi\n* titleSv\n* ministryShortName\n* ministryName\n"
+        "description" : "(NOT IMPLEMENTED)\n\nSession list item information. The amount of information returned depends on list item state.\nIf list item state is 4 (decision written/päätöskirjattu), 5 (decision finalized/pöytäkirjattu) or 6 (decision checked/tarkistettu), full information is returned. Otherwise only the following is returned\n* caseId\n* presenter\n* sessionId\n* titleFi\n* titleSv\n* ministryShortName\n* ministryName\n"
       },
       "File" : {
         "type" : "object",
@@ -3481,7 +3482,8 @@
             "description" : "file contents as base64 encoded string",
             "format" : "byte"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "FileInfo" : {
         "type" : "object",
@@ -3499,7 +3501,8 @@
             "description" : "MIME type of the file",
             "example" : "image/jpeg"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "ListDocument" : {
         "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
@@ -3566,7 +3569,8 @@
           "caseId" : {
             "$ref" : "#/components/schemas/TechnicalId"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "MinisterInfo" : {
         "type" : "object",
@@ -3583,7 +3587,8 @@
             "maxLength" : 256,
             "type" : "string"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "PersonInfo" : {
         "type" : "object",
@@ -3608,26 +3613,27 @@
             "maxLength" : 32,
             "type" : "string"
           }
-        }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
       },
       "SessionType" : {
         "type" : "string",
-        "description" : "* 'VN' - Valtioneuvosto / government plenary session\n* 'TP' - Tasavallan Presidnetti / presidential session\n* 'RV' - Raha-asianvaliokunta /  monetary session\n",
+        "description" : "(NOT IMPLEMENTED)\n* 'VN' - Valtioneuvosto / government plenary session\n* 'TP' - Tasavallan Presidnetti / presidential session\n* 'RV' - Raha-asianvaliokunta /  monetary session\n",
         "enum" : [ "VN", "TP", "RV" ]
       },
       "RenditionType" : {
         "type" : "string",
-        "description" : "* 'word' - Microsoft Word DOCX format\n* 'pdf' - Portable document format\n* 'xml' - XML, that is, structured document\n* 'original' - original document type of the document\n",
+        "description" : "(NOT IMPLEMENTED)\n* 'word' - Microsoft Word DOCX format\n* 'pdf' - Portable document format\n* 'xml' - XML, that is, structured document\n* 'original' - original document type of the document\n",
         "enum" : [ "word", "pdf", "xml", "original" ]
       },
       "ListStatus" : {
         "type" : "string",
-        "description" : "Indicates status of list item. TODO check whether the coding is the same for list and session status\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress\n",
+        "description" : "Indicates status of list item. TODO check whether the coding is the same for list and session status (NOT IMPLEMENTED)\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress\n",
         "enum" : [ "1", "2", "4", "5", "6", "7" ]
       },
       "SessionStatus" : {
         "type" : "string",
-        "description" : "Indicates session status\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress",
+        "description" : "Indicates session status (NOT IMPLEMENTED)\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress",
         "enum" : [ "1", "2", "4", "5", "6", "7" ]
       },
       "inline_response_200" : {
