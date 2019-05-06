@@ -2439,7 +2439,7 @@
           },
           "RetentionPeriodEnd" : {
             "type" : "string",
-            "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta"
+            "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta (NOT IMPLEMENTED)"
           },
           "RetentionPeriodCalculationGrounds" : {
             "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
@@ -2993,7 +2993,8 @@
           "FunctionClassifiction" : {
             "$ref" : "#/components/schemas/ClassificationScheme_FunctionClassifiction"
           }
-        }
+        },
+        "description" : "NOT IMPLEMENTED"
       },
       "FunctionClassification" : {
         "type" : "object",
@@ -3293,7 +3294,7 @@
       },
       "CaseType" : {
         "type" : "string",
-        "description" : "SÄHKE2 2.15 (asian) Tyyppi. Koodiston \"caseType\" mukainen kooditus TODO selvitä oikea koodaus esimerkkiin\n"
+        "description" : "SÄHKE2 2.15 (asian) Tyyppi. Koodiston \"caseType\" mukainen kooditus TODO selvitä oikea koodaus esimerkkiin (NOT IMPLEMENTED)\n"
       },
       "AgentRole" : {
         "type" : "string",
