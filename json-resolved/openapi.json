@@ -2750,7 +2750,7 @@
           },
           "Custom" : {
             "type" : "array",
-            "description" : "SÄHKE2 2.8 (asiakirjan) Organisaatiokohtaiset metatiedot",
+            "description" : "SÄHKE2 2.8 (asiakirjan) Organisaatiokohtaiset metatiedot  (NOT IMPLEMENTED)",
             "items" : {
               "$ref" : "#/components/schemas/CustomMetadata"
             }
