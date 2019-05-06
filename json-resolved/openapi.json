@@ -2478,14 +2478,14 @@
           },
           "Action" : {
             "type" : "array",
-            "description" : "Asiaan liittyvät toimenpiteet",
+            "description" : "Asiaan liittyvät toimenpiteet (NOT IMPLEMENTED)",
             "items" : {
               "$ref" : "#/components/schemas/Action"
             }
           },
           "Custom" : {
             "type" : "array",
-            "description" : "SÄHKE2 2.8 Organisaatiokohtaiset metatiedot",
+            "description" : "SÄHKE2 2.8 Organisaatiokohtaiset metatiedot  (NOT IMPLEMENTED)",
             "items" : {
               "$ref" : "#/components/schemas/CustomMetadata"
             }
