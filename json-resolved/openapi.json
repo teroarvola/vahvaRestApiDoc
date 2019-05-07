@@ -3278,7 +3278,7 @@
           },
           "TypeSpecifier" : {
             "type" : "string",
-            "description" : "JHS 191 asiakirjatyypin tarkenne",
+            "description" : "JHS 191 asiakirjatyypin tarkenne (NOT IMPLEMENTED)",
             "example" : "Neuvoteltu VM:n kanta"
           },
           "TypeCode" : {
