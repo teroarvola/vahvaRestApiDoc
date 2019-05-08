@@ -1096,6 +1096,57 @@
         }
       }
     },
+    "/api/v1/DocumentsByVersion/{documentRecno}" : {
+      "get" : {
+        "summary" : "Return single document and its contents by technical id\n",
+        "parameters" : [ {
+          "name" : "documentRecno",
+          "in" : "path",
+          "description" : "Document.recno of the document",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idType",
+          "in" : "query",
+          "description" : "Type of record Id, by default vahvaRecno",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "vahvaRecno", "vahvaDocumentNumber" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Document requested, with document metadata and document contents",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "404" : {
+            "description" : "Document does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
     "/api/v1/Documents" : {
       "put" : {
         "summary" : "Update document (NOT IMPLEMENTED)",
