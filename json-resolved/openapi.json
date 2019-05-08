@@ -1096,13 +1096,13 @@
         }
       }
     },
-    "/api/v1/DocumentsByVersion/{documentRecno}" : {
+    "/api/v1/DocumentsByVersion/{documentVersionRecno}" : {
       "get" : {
         "summary" : "Return single document and its contents by technical id\n",
         "parameters" : [ {
-          "name" : "documentRecno",
+          "name" : "documentVersionRecno",
           "in" : "path",
-          "description" : "Document.recno of the document",
+          "description" : "DocumentVersion.recno of the document",
           "required" : true,
           "style" : "simple",
           "explode" : false,
