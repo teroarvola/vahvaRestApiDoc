@@ -1058,17 +1058,6 @@
           "schema" : {
             "type" : "string"
           }
-        }, {
-          "name" : "idType",
-          "in" : "query",
-          "description" : "Type of record Id, by default vahvaRecno",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "vahvaRecno", "vahvaDocumentNumber" ]
-          }
         } ],
         "responses" : {
           "200" : {
@@ -1108,17 +1097,6 @@
           "explode" : false,
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "idType",
-          "in" : "query",
-          "description" : "Type of record Id, by default vahvaRecno",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "vahvaRecno", "vahvaDocumentNumber" ]
           }
         } ],
         "responses" : {
@@ -2398,7 +2376,10 @@
         "type" : "object",
         "properties" : {
           "Subject" : {
-            "$ref" : "#/components/schemas/Subject"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Keyword"
+            }
           },
           "Created" : {
             "type" : "string",
@@ -2630,7 +2611,10 @@
         "type" : "object",
         "properties" : {
           "Subject" : {
-            "$ref" : "#/components/schemas/Subject"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Keyword"
+            }
           },
           "Created" : {
             "type" : "string",
@@ -3535,7 +3519,7 @@
         },
         "description" : "(NOT IMPLEMENTED)\n"
       },
-      "Subject" : {
+      "Keyword" : {
         "type" : "object",
         "properties" : {
           "title" : {
@@ -3543,12 +3527,12 @@
             "description" : "keyword as string",
             "example" : "VNK"
           },
-          "uri" : {
+          "description" : {
             "type" : "string",
             "description" : "keyword URI"
           }
         },
-        "description" : "Subject keyword object"
+        "description" : "Keyword object"
       },
       "FileInfo" : {
         "type" : "object",
