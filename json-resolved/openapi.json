@@ -2398,8 +2398,7 @@
         "type" : "object",
         "properties" : {
           "Subject" : {
-            "type" : "string",
-            "description" : "SÄHKE2 2.1 Aihe (Subject) as URI of the subject in e.g YSO or JUHO"
+            "$ref" : "#/components/schemas/Subject"
           },
           "Created" : {
             "type" : "string",
