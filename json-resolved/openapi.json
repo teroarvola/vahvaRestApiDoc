@@ -1096,7 +1096,7 @@
         }
       }
     },
-    "/api/v1/DocumentsByVersion/{documentVersionRecno}" : {
+    "/api/v1/DocumentVersions/{documentVersionRecno}" : {
       "get" : {
         "summary" : "Return single document and its contents by technical id\n",
         "parameters" : [ {
