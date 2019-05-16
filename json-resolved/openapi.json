@@ -3537,6 +3537,21 @@
         },
         "description" : "(NOT IMPLEMENTED)\n"
       },
+      "Subject" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "description" : "keyword as string",
+            "example" : "VNK"
+          },
+          "uri" : {
+            "type" : "string",
+            "description" : "keyword URI"
+          }
+        },
+        "description" : "Subject keyword object"
+      },
       "FileInfo" : {
         "type" : "object",
         "properties" : {
