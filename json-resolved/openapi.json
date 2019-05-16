@@ -2630,8 +2630,7 @@
         "type" : "object",
         "properties" : {
           "Subject" : {
-            "type" : "string",
-            "description" : "SÄHKE2 2.1 (asiakirjan) Aihe"
+            "$ref" : "#/components/schemas/Subject"
           },
           "Created" : {
             "type" : "string",
