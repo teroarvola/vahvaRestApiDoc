@@ -3522,14 +3522,25 @@
       "Keyword" : {
         "type" : "object",
         "properties" : {
-          "title" : {
+          "Title" : {
             "type" : "string",
-            "description" : "keyword as string",
-            "example" : "VNK"
+            "description" : "Keyword title",
+            "example" : "valtioneuvosto"
           },
-          "description" : {
+          "Description" : {
             "type" : "string",
-            "description" : "keyword URI"
+            "description" : "Keyword description (URI if imported from ontology)",
+            "example" : "http://www.yso.fi/onto/juho/p1584"
+          },
+          "Recno" : {
+            "type" : "string",
+            "description" : "Keyword recno (identifier)",
+            "example" : "200123"
+          },
+          "Language" : {
+            "type" : "string",
+            "description" : "Keyword language (default Finnish)",
+            "example" : "FIN"
           }
         },
         "description" : "Keyword object"
