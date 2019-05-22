@@ -87,7 +87,7 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "vahvaRecno", "caseNumber", "eduskuntaId" ]
+            "enum" : [ "vahvaRecno", "caseNumber (not implemented)", "eduskuntaId (not implemented)" ]
           }
         }, {
           "name" : "returnClassificationScheme",
@@ -577,7 +577,7 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "vahvaRecno", "vahvaDocumentNumber" ]
+            "enum" : [ "vahvaRecno", "vahvaDocumentNumber (not implemented)" ]
           }
         } ],
         "responses" : {
