@@ -67,7 +67,7 @@
     },
     "/api/v1/Cases/{caseRecno}" : {
       "get" : {
-        "summary" : "Return single case by technical id. with Task / Record / Document metadata information. Note that Document contents still need to be fetched by GET /api/v1/documents/{documentRecno}",
+        "summary" : "Return single case by technical id. with Task / Record / Document metadata information. NOTE! Document contents still need to be fetched by GET /api/v1/documents/{documentRecno}",
         "parameters" : [ {
           "name" : "caseRecno",
           "in" : "path",
@@ -557,7 +557,7 @@
     },
     "/api/v1/Records/{recordRecno}" : {
       "get" : {
-        "summary" : "Return single record and its document metadata by technical id. Note that document contents are not returned with this operation, they need to be fetched separate  with GET /api/v1/documents/{documentRecno}\n",
+        "summary" : "Return single record and its document metadata by technical id. NOTE! Document contents are not returned with this operation, they need to be fetched separate  with GET /api/v1/documents/{documentRecno}\n",
         "parameters" : [ {
           "name" : "recordRecno",
           "in" : "path",
