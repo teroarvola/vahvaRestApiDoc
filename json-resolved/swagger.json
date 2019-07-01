@@ -1,0 +1,3894 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "VAHVA rest API",
+    "description" : "# VAHVA system public API  \nThe API has been designed with the following principles in mind\n* Interface should be SÄHKE2 compliant, i.e support full SÄHKE2 metadata model and enforce mandatory metadata\n* Interface should be usable without changes in all VAHVA installations (VNK VAHVA, VirastoVahva)\n* Installation specific metadata can be used\n* Use component-based schema definitions to make changes easier \n# General usage guidelines\nClient always needs to authenticate with the server and get a session key. Authentication happens with basic authentication with system-specific credentials. \n## General read usage\nReading cases and documents happens in three stages as follows\n* Read case list with GET /api/v1/cases => case metadata\n  * Here API user must be prepared to handle situations where not all data is returned in a single call. This may be the case when maxRows (default is 100) cases is returned with first call. If this happens, further calls with page and maxRows parameters set properly may be required. \n  * Server side is stateless, all state needs to be handled by the client\n* When case is selected, get case details with GET /api/v1/cases/{caseRecno} => case, record and document metadata\n* When a document (or rather, a relevant rendition of a case record) in case is selected, get document contents with GET /api/v1/documents/{documentRecno}\n## General write usage\nCreating new cases always requires the following pieces of information (PUT /api/v1/cases)\n* Technical id of the responsible organization (Contact.recno - either hard coded or fetched with GET /api/v1/contacts)\n* Technical is the responsible person (Contact.recno, see above)\n* Classification code of the new case\n* Language of the case\n* Title of the case\n* Status of the case\n* Information regarding restriction status of the case (such as publicity of the case)\n* Once a case has been created, new records (PUT /api/v1/records) can be added to the case, and new documents (PUT /api/v1/documents) can be added to the record. Records have a number of required pieces of information. They are quite similar to case mandatory information, with classification code replaced by document type.\n## Date formats\nDate format is according to SFS-EN 28601 standard, which is very similar to ISO 8601 format. The format is strictly:\n  * **yyyy-MM-ddThh:mm:sszzz**\n  * example: 2019-05-03T12:17:00+03:00\n  \n  When passing date values in URL query string you need to encode the value. **The plus sign in timezone will not work as it will interpreted as space, so you need to encode it to %2B.**\n  \n# Implementation schedule based on business needs\n* Stage 2a2\n    * Hankeikkuna, LVM Liferay, YJA need to read cases and documents from VNK VAHVA\n        * GET /api/v1/cases/{caseRecno}\n        * GET /api/v1/cases - with some search criteria, others maybe 2b\n        * GET /api/v1/record/{recordRecno}\n    * Buketti needs to insert new cases and documents\n        * PUT /api/v1/cases\n        * PUT /api/v1/records\n        * PUT /api/v1/documents\n        * GET /api/v1/contacts/{contactRecno} - possibly\n        * GET /api/v1/contacts/{contactEmail} - possibly\n        * GET /api/v1/codes/{codeName} - possibly\n    * General needs, most likely\n        * GET /api/v1/records - with at least some search criteria\n* Stage 2b \n    * General integration needs, most likely\n        * GET /api/v1/contacts\n        * GET /api/v1/cases - rest of the search criteria\n        * GET /api/v1/records - rest of the search criteria\n        * POST /api/v1/cases\n        * POST /api/v1/records\n        * POST /api/v1/documents\n        * GET /api/v1/classifications\n        * GET /api/v1/functions/{functionCode}\n        * GET /api/v1/documenttypes/{functionCode}\n# ToDo / Improvement needed on following\n* Find out the actual coding example from VNK, marked as \"TODO\" towards the end of spec\n* Unify interface description language to English, now a little bit mixed English and Finnish\n* It would be beneficial to document mappings to Tieto 360 data model. Tieto?\n# Changes\n* Changed Case, Action, Record and Document timestamps to date-time instead of date / Riku Sarlin 2018-06-14\n* Unified all operations under plural substantives / Riku Sarlin 2018-06-14\n* Added further search parameters to case and record search (all dates, roles, contacts, statuses) based on LVM needs / Riku Sarlin 2018-06-14\n* Added GET /api/v1/session and DELETE /api/v1/session operations and authentication to operations / Riku Sarlin 2018-07-09\n* Some changes to ensure proper performance / Riku Sarlin 2018-07-10\n  * Changed paging to use recnos, lists always returned in recno order. The solution puts some burden on paging to client side - client needs to track \"first\" and \"last\" recnos in paging\n  * GET /api/v1/cases only returns case information - no tasks, records or documents. All case information can then be fetched with GET /api/v1/cases/{caseRecno}\n  * Added separate GET /api/v1/documents/{documentRecno} operation that returns document contents, too (GET /api/v1/records/{recordRecno} now just returns document metadata)\n  * Modified operations so that classification is returned and given by a single string of type \"02.01.01.00\" rather than a complex structured element. GET /api/v1/classifications still returns the structured element, and case GET operations can return it, but by default do not.\n  * Added some sanity checks to GET /api/v1/cases and GET /api/v1/records parameters to ensure proper performance and sensible result set sizes\n* Took /api/v1/session operations away, handled via basic auth and VIA, and possible separate public API / Riku Sarlin 2018-08-13\n* Added contact categories to contact, and ability to limit contacts by category in contact search / Riku Sarlin 2018-08-31\n* Updated DocumentType to contain type, typeSpecifier and type Code. Changed NewRecordData and Record accordingly / Riku Sarlin 2018-10-03\n* Updated to correspond correctly to mapping excel / Joakim Björkgren 2018-12-19\n* Updated implementation status of includeCaseReferences and CaseFileRelation / Tero Arvola 2019-01-30\n* Updated restriction field to not be mandatory for NewCaseData / Tero Arvola 2019-01-30\n* Updated paging / Tero Arvola 2019-02-12\n* Updated publicOnly as not implemented / Tero Arvola 2019-03-07\n* Updated NewCaseData.Status description / Tero Arvola 2019-04-30\n* Updated casing and datatypes (array --> string) for Case and Document schemas / Tero Arvola 2019-05-02\n* Updates on implementation status / Tero Arvola 2019-05-06, 2019-05-07\n* Updated Keyword object for Case.Subject and Record.Subject / Tero Arvola 2019-05-16\n* Added includeFileData option for Documents and DocumentVersions / Tero Arvola 2019-05-22\n* Altered language in Records/{RecordRecno} and Cases/{CaseRecno} description to emphasize document contents only being retrievable by Documents/{DocumentRecno} and DocumentVersions/{DocumentVersionRecno} / Joakim Björkgren 2019-05-24\n* Added Record.Date / Tero Arvola 2019-05-27\n",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://virtserver.swaggerhub.com/rikusarlin/vahvaRest/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  } ],
+  "paths" : {
+    "/api/v1/Codes/{codeName}" : {
+      "get" : {
+        "summary" : "Return codes by code name in a given language",
+        "parameters" : [ {
+          "name" : "codeName",
+          "in" : "path",
+          "description" : "Name of the coded value",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole", "ministry" ]
+          }
+        }, {
+          "name" : "lang",
+          "in" : "query",
+          "description" : "Language of the code, by default \"fi\"",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "fi", "sv", "en" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Codes requested in the specified language",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Access denied"
+          },
+          "404" : {
+            "description" : "Code not found"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          },
+          "503" : {
+            "description" : "Service unavalaible"
+          }
+        }
+      }
+    },
+    "/api/v1/Cases/{caseRecno}" : {
+      "get" : {
+        "summary" : "Return single case by technical id. with Task / Record / Document metadata information. NOTE! Document contents still need to be fetched by GET /api/v1/documents/{documentRecno}",
+        "parameters" : [ {
+          "name" : "caseRecno",
+          "in" : "path",
+          "description" : "Case.recno of the case",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idType",
+          "in" : "query",
+          "description" : "Type of case Id, by default vahvaRecno",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "vahvaRecno", "caseNumber (not implemented)", "eduskuntaId (not implemented)" ]
+          }
+        }, {
+          "name" : "returnClassificationScheme",
+          "in" : "query",
+          "description" : "Whether to return classification scheme or not. Defaults to false. It is assumed that the whole classification scheme is only used when archiving, in normal use classificationCode suffices.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Case requested",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Case"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Access denied"
+          },
+          "404" : {
+            "description" : "Case does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Cases" : {
+      "get" : {
+        "summary" : "Return cases based on search criteria. \n",
+        "description" : "Note that this operation ONLY RETURNS CASE INFORMATION - no tasks, records or documents are returned to ensure proper performance. Further information can then be fetched by case using GET /api/v1/cases/{caseRecno}. Results are always returned in recno order, that is, by creation timestamp. By default the set is in ascending order, but parameter reverseSortOrder can be used to change the order to descending.\nThe following sanity checks are conducted on search criteria, breaking these rules will result in 405 return code with description. If effect, the API allow searching cases at maximum one year at a time, and is always limited by some contact.\n* at least one contact is required (usually the responsible organization or responsible person)\n* for any date parameter, to and from dates (if both given) may not be further than one year apart\n* for any date parameter, if to date is given alone, it may not be in the future\n",
+        "parameters" : [ {
+          "name" : "title",
+          "in" : "query",
+          "description" : "Case.Description. Returns results that match the case description (even partly). Default is empty. If given, needs to be at least 3 characters long.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "classificationCodes",
+          "in" : "query",
+          "description" : "List of Case.ToClassificationCodes. Results are filtered by given classification codes. Default is empty.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "otherId",
+          "in" : "query",
+          "description" : "OtherIds of the Case. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "otherIdType",
+          "in" : "query",
+          "description" : "OtherId type. Can be EduskuntaTunnus, VahvaRecno or CaseNumber. There need to be exactly as many otherId as there are otherIdType fields. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "description" : "Limit to contacts in this/these role(s). Defaults to empty.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AgentRole"
+            }
+          }
+        }, {
+          "name" : "contact",
+          "in" : "query",
+          "description" : "List of contact technical id:s (recno) allowed. Results are filtered by given contacts. Defaults to empty. Can be limited to certain role(s) with \"role\" parameter.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "subOrganizationOk",
+          "in" : "query",
+          "description" : "When searching with organization contacts, if set to true, then we have a hit if case's owning organizaton\nis a suborganization of a contact listed in parameter \"contact\". That is, we can search with LVM\nrecno, and all LVM sub-units would be considered a hit. In effect, this expands the list of contact\nrecnos in search criteria to all sub-organizations. Defaults to false. (NOT IMPLEMENTED)\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "caseStatus",
+          "in" : "query",
+          "description" : "List of case statuses allowed (according to recno value in caseStatus). Results are filtered by given status code technical ids (recno).\nDefaults to empty.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
+          }
+        }, {
+          "name" : "modificationDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose modification timestamp is later than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "modificationDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose modification timestamp is earlier than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "creationDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose creation timestamp later than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "creationDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose creation timestamp is earlier than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "issuedDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose issued timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "issuedDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose issued timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "sentDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose sent timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "sentDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose sent timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "availableDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose available timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "availableDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose available timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "acquiredDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose acquired timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "acquiredDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose acquired timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "includeCaseReferences",
+          "in" : "query",
+          "description" : "Whether to include case-case references. Defaults to false. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "includeCustomMetadata",
+          "in" : "query",
+          "description" : "Whether to include custom metadata. Defaults to false. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "publicOnly",
+          "in" : "query",
+          "description" : "Whether to to return publishable information only. Defaults to false. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "returnClassificationScheme",
+          "in" : "query",
+          "description" : "Whether to return classification scheme or not. Defaults to false. It is assumed that the whole classification scheme is only used when archiving, in normal use classificationCode suffices.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Page number. Paging based on maxRows parameter below. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "maxRows",
+          "in" : "query",
+          "description" : "Page size. Defaults to 100. Used as LIMIT in database search. If value is less than 1 or greated than 1000, a 405 with \"The allowed values of maxRows are integer values between 1 and 1000\" message is returned.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "reverseSortOrder",
+          "in" : "query",
+          "description" : "Result set id by default ordered by recno ascending order. If true, result set will be ordered by recno descending order. By default false.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Cases requested. Note that only Case information is returned - no Task / Record / Document information is returned, although data model implies this.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Case"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input, such as wrong format of date-time object, unknown contact type or illegal combination of search criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      },
+      "put" : {
+        "summary" : "Update case (NOT IMPLEMENTED)",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Case updated successfully, returns updated case",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Case"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Access denied"
+          },
+          "405" : {
+            "description" : "Invalid input, such as trying to update fields that cannot be updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Insert case",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body_1"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Case inserted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Case"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Access denied"
+          },
+          "405" : {
+            "description" : "Invalid input",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Records/{recordRecno}" : {
+      "get" : {
+        "summary" : "Return single record and its document metadata by technical id. NOTE! Document contents are not returned with this operation, they need to be fetched separate  with GET /api/v1/documents/{documentRecno}\n",
+        "parameters" : [ {
+          "name" : "recordRecno",
+          "in" : "path",
+          "description" : "Document.recno of the document",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idType",
+          "in" : "query",
+          "description" : "Type of record Id, by default vahvaRecno",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "vahvaRecno", "vahvaDocumentNumber (not implemented)" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Record requested, with document metadata",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Record"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "404" : {
+            "description" : "Record does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Records" : {
+      "get" : {
+        "summary" : "Return records based on search criteria. Returned cases are sorted by Case.recno, that is, by creation date.\n",
+        "description" : "Note that this operation does not return document contents. This can be fetched by document using GET /api/v1/records/{documentRecno}. By default the set is in ascending order, but parameter reverseSortOrder can be used to change the order to descending.\nThe following sanity checks are conducted on search criteria, breaking these rules will result in 405 return code with description. If effect, the API allow searching records at maximum one year at a time, and is always limited by some contact.\n* at least one contact is required (usually the responsible organization or responsible person)\n* for any date parameter, to and from dates (if both given) may not be further than one year apart\n* for any date parameter, if to date is given alone, it may not be in the future\n",
+        "parameters" : [ {
+          "name" : "caseId",
+          "in" : "query",
+          "description" : "Returns records of given case(s) identified by case id (not the same as recno which is technical id)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "title",
+          "in" : "query",
+          "description" : "Document.Title. Returns results that match record title (even partly). Defaults to empty. Needs to be at least 3 characters long.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "description" : "Limit to contacts in this/these role(s). Defaults to empty.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AgentRole"
+            }
+          }
+        }, {
+          "name" : "otherId",
+          "in" : "query",
+          "description" : "OtherIds of the Case. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "otherIdType",
+          "in" : "query",
+          "description" : "OtherId type. Can be EduskuntaTunnus, VahvaRecno or CaseNumber. There need to be exactly as many otherId as there are otherIdType fields. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "contact",
+          "in" : "query",
+          "description" : "List of contact technical id:s (recno) allowed. Results are filtered by given contacts.\nDefaults to empty. Can be limited to certain role(s) with \"role\" parameter.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "subOrganizationOk",
+          "in" : "query",
+          "description" : "When searching with organization contacts, if set to true, then we have a hit if record's owning organizaton\nis a suborganization of a contact listed in parameter \"contact\". That is, we can search with LVM\nrecno, and all LVM sub-units would be considered a hit. In effect, this expands the list of contact\nrecnos in search criteria to all sub-organizations. Defaults to false.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "recordStatus",
+          "in" : "query",
+          "description" : "List of record statuses allowed (according to recno value in recordStatus). Results are filtered by given status code technical ids (recno).\nDefaults to empty.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
+          }
+        }, {
+          "name" : "modificationDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose modification timestamp is later than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "modificationDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose modification timestamp is earlier than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "creationDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose creation timestamp later than this timestamp. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "creationDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose creation timestamp is earlier than this date. Default is empty. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "issuedDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose issued timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "issuedDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose issued timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "sentDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose sent timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "sentDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose sent timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "availableDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose available timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "availableDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose available timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "acquiredDateFrom",
+          "in" : "query",
+          "description" : "Limit results to those whose acquired timestamp later than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "acquiredDateTo",
+          "in" : "query",
+          "description" : "Limit results to those whose acquired timestamp is earlier than this timestamp. Default is empty. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "includeCaseReferences",
+          "in" : "query",
+          "description" : "Whether to include document-case references. Defaults to false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "includeDocumentReferences",
+          "in" : "query",
+          "description" : "Whether to include document-document references. Defaults to false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "includeFiles",
+          "in" : "query",
+          "description" : "Whether to include files. Defaults to false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "includeCustomMetadata",
+          "in" : "query",
+          "description" : "Whether to include custom metadata. Defaults to false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "publicOnly",
+          "in" : "query",
+          "description" : "Whether to to return publishable information only. Defaults to false. NOT IMPLEMENTED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Page of the serch results. Default value is 0. Used with maxRows.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "maxRows",
+          "in" : "query",
+          "description" : "Page size. Defaults to 100. Used as LIMIT in database search. If value is less than 1 or greated than 1000, a 405 with \"The allowed values of maxRows are integer values between 1 and 1000\" message is returned.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "reverseSortOrder",
+          "in" : "query",
+          "description" : "Result set id by default ordered by recno ascending order. If true, result set will be ordered by recno descending order. By default false.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Records requested, with document metadata (no document contents)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Record"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input, such as wrong format of date-time object, unknown contact type or illegal combination of search criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      },
+      "put" : {
+        "summary" : "Update record (NOT IMPLEMENTED)",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body_2"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Record updated successfully, returns updated record",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Record"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input, such as trying to update fields that cannot be updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Insert record. A record can be inserted with or without case.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body_3"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Record inserted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Record"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Documents/{documentRecno}" : {
+      "get" : {
+        "summary" : "Return single document and its contents by technical id\n",
+        "parameters" : [ {
+          "name" : "documentRecno",
+          "in" : "path",
+          "description" : "Document.recno of the document",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "includeFileData",
+          "in" : "query",
+          "description" : "If true, returns file contents in DocumentContents. Defaults to true.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Document requested, with document metadata and document contents",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "404" : {
+            "description" : "Document does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/DocumentVersions/{documentVersionRecno}" : {
+      "get" : {
+        "summary" : "Return single document and its contents by technical id\n",
+        "parameters" : [ {
+          "name" : "documentVersionRecno",
+          "in" : "path",
+          "description" : "DocumentVersion.recno of the document",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "includeFileData",
+          "in" : "query",
+          "description" : "If true, returns file contents in DocumentContents. Defaults to true.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Document requested, with document metadata and document contents",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "404" : {
+            "description" : "Document does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Documents" : {
+      "put" : {
+        "summary" : "Update document (NOT IMPLEMENTED)",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body_4"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Document updated successfully, returns updated document",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input, such as trying to update fields that cannot be updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Add document to record",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/body_5"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Document inserted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "405" : {
+            "description" : "Invalid input",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Error during request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Contacts/{contactRecno}" : {
+      "get" : {
+        "summary" : "Return single contact by technical id",
+        "parameters" : [ {
+          "name" : "contactRecno",
+          "in" : "path",
+          "description" : "Contact.recno of the case",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Contact requested",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VahvaContact"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized"
+          },
+          "404" : {
+            "description" : "Contact does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Contacts/{contactEmail}" : {
+      "get" : {
+        "summary" : "Return single contact by email address (which is unique in VAHVA)",
+        "parameters" : [ {
+          "name" : "contactEmail",
+          "in" : "path",
+          "description" : "VAHVA Contact.Teleobject 6",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Contact requested",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VahvaContact"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Contact does not exist"
+          },
+          "405" : {
+            "description" : "Invalid input"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Contacts" : {
+      "get" : {
+        "summary" : "Return contacts based on search criteria",
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Contact type of the case",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/VahvaContactType"
+          }
+        }, {
+          "name" : "categories",
+          "in" : "query",
+          "description" : "Contact categories to limit search results to",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/VahvaContactCategory"
+            }
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "description" : "Contact's Contact.SearchName. Returns results that match the name (even partly)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "otherid",
+          "in" : "query",
+          "description" : "Contact's Other id",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "otheridtype",
+          "in" : "query",
+          "description" : "Contact's OtherId type",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "active",
+          "in" : "query",
+          "description" : "Contact's Contact.ActiveContact by default true",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "createdFrom",
+          "in" : "query",
+          "description" : "The lower limit for Contact.CreatedDate. Given in seconds. Defaults to none.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "createdTo",
+          "in" : "query",
+          "description" : "The upper limit for Contact.CreatedDate. Given in seconds. Defaults to none.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "modifiedFrom",
+          "in" : "query",
+          "description" : "The lower limit for Contact.ModifiedDate. Given in seconds. Defaults to none.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "modifiedTo",
+          "in" : "query",
+          "description" : "The upper limit for Contact.ModifiedDate. Given in seconds. Defaults to none.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Page of the serch results. Default value is 0. Used with maxRows.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "maxRows",
+          "in" : "query",
+          "description" : "Page size, see \"page\" above. Defaults to \"all\", i.e all matches are returned",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "reverseSortOrder",
+          "in" : "query",
+          "description" : "If the query is to be desplayed in reversed sort order. Default value is false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Contacts requested",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/VahvaContact"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "No results found when there should be (search by unique id)"
+          },
+          "405" : {
+            "description" : "Invalid input, such as wrong format of date-time object or unknown contact type."
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Classifications" : {
+      "get" : {
+        "summary" : "Returns the whole classification scheme (NOT IMPLEMENTED)",
+        "responses" : {
+          "200" : {
+            "description" : "Classification scheme",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClassificationScheme"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Functions/{functionCode}" : {
+      "get" : {
+        "summary" : "Return function classification starting from a given function code. Note that the lowest level of function codes are actually the action types allowed in the function. (NOT IMPLEMENTED)\n",
+        "parameters" : [ {
+          "name" : "functionCode",
+          "in" : "path",
+          "description" : "Function code of interest",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The function and its subfunctions were found and are returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FunctionClassification"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "No function with the given function code found"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Documenttypes/{functionCode}" : {
+      "get" : {
+        "summary" : "Return document types allowed for a given function code. (NOT IMPLEMENTED)\n",
+        "parameters" : [ {
+          "name" : "functionCode",
+          "in" : "path",
+          "description" : "Function code of interest",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The function code was found, return document types",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DocumentType"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "No function with the given function code found"
+          },
+          "500" : {
+            "description" : "Error during request processing"
+          }
+        }
+      }
+    },
+    "/api/v1/Sessions" : {
+      "get" : {
+        "summary" : "Fetch sessions (NOT IMPLEMENTED)",
+        "description" : "Find sessions possibly by type and date limits",
+        "operationId" : "fetchSessions",
+        "parameters" : [ {
+          "name" : "sessionType",
+          "in" : "query",
+          "description" : "Session type, by default none (all are returned)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/SessionType"
+          }
+        }, {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start date from which to fetch sessions. Can be skipped, given alone or together with endDate. Limits fetched sessions according to plannedStart. Empty by default.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End date to which to fetch sessions. Can be skipped, given alone or together with startDate. Limits fetched sessions according to plannedStart. Empty by default.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "modifiedSince",
+          "in" : "query",
+          "description" : "Limit results to those sessions added or modified after this timestamp. This includes sessions with changed list items and/or list item documents. Addition, modification and deletion all count as change.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Session"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Lists" : {
+      "get" : {
+        "summary" : "Fetch list items (NOT IMPLEMENTED)",
+        "description" : "Fetch list items by session Id",
+        "operationId" : "fetchList",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "Technical ID of the session in question",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }, {
+          "name" : "modifiedSince",
+          "in" : "query",
+          "description" : "Limit results to those list items added or modified after this timestamp. This includes sessions with changed list item documents. Addition, modification and deletion all count as change.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation. Note that if session state is not yet \"decision written\" / \"decision finalized\" / \"decision checked\" (päätöskirjattu / pöytäkirjattu / tarkistettu) then only basic info regarding the list items (\"suppea asialista\") is returned, meaning the following\n* caseId\n* presenter\n* sessionId\n* titleFi\n* titleSv\n* ministryShortName\n* ministryName\n",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid parameters",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Session not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Listdocuments/{listItemId}" : {
+      "get" : {
+        "summary" : "Fetch list item documents (NOT IMPLEMENTED)",
+        "description" : "Fetch list item documents",
+        "operationId" : "fetchListItemDocuments",
+        "parameters" : [ {
+          "name" : "listItemId",
+          "in" : "path",
+          "description" : "Technical ID of the list item",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }, {
+          "name" : "returnFiles",
+          "in" : "query",
+          "description" : "Whether to return file contents or not, by default false. You can fetch file contents in binary form with separate\noperation with documentId.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "rendition",
+          "in" : "query",
+          "description" : "Rendition requested, by default \"pdf\". If requested rendition is not available,\noriginal document is returned. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/RenditionType"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the documents and their technical IDs. Multiple files can be returned.\n",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid parameters, or list item not in states 4 / 5 / 6",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "List item not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Sessiondocuments/{sessionId}" : {
+      "get" : {
+        "summary" : "Fetch session documents (NOT IMPLEMENTED)",
+        "description" : "Fetch session document (that is, documents of list items of a session) by session id",
+        "operationId" : "fetchSessionDocuments",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "description" : "Technical ID of the session",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }, {
+          "name" : "returnFiles",
+          "in" : "query",
+          "description" : "Whether to return file contents or not, by default false. You can fetch file contents in binary form with separate\noperation with documentId.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "rendition",
+          "in" : "query",
+          "description" : "Rendition requested, by default \"pdf\". If requested rendition is not available,\noriginal rendition is returned. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/RenditionType"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the documents and their technical IDs. Multiple files can be returned.\n",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid parameters, or session not in states 4 / 5 / 6",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Session not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Listocumentids/{listItemId}" : {
+      "get" : {
+        "summary" : "Fetch list item document ids so that each file can be fetched separately (NOT IMPLEMENTED)",
+        "description" : "Fetch list item document ids by list item id",
+        "operationId" : "fetchListItemDocumentsIds",
+        "parameters" : [ {
+          "name" : "listItemId",
+          "in" : "path",
+          "description" : "Technical ID of the list item",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Technical IDs of list item's documents. \n",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "List item not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Sessiondocumentids/{sessionId}" : {
+      "get" : {
+        "summary" : "Fetch session list item document ids so that each file can be fetched separately",
+        "description" : "Fetch session list item document ids by session id (NOT IMPLEMENTED)",
+        "operationId" : "fetchSessionDocumentsIds",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "path",
+          "description" : "Technical ID of the session",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_4"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Session not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/Sessiondocuments/{documentId}" : {
+      "get" : {
+        "summary" : "Fetch dession document (NOT IMPLEMENTED)",
+        "description" : "Fetch document by document id",
+        "operationId" : "fetchDocument",
+        "parameters" : [ {
+          "name" : "documentId",
+          "in" : "path",
+          "description" : "Technical ID of the document",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }, {
+          "name" : "rendition",
+          "in" : "query",
+          "description" : "Rendition requested, by default \"pdf\". If requested rendition is not available,\noriginal document is returned. \n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/RenditionType"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the document requested.\n",
+            "content" : {
+              "multipart/mixed" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Unauthorized"
+          },
+          "404" : {
+            "description" : "Document not found"
+          },
+          "500" : {
+            "description" : "Error in request processing",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "VahvaContact" : {
+        "type" : "object",
+        "properties" : {
+          "ContactType" : {
+            "$ref" : "#/components/schemas/VahvaContactType"
+          },
+          "Name" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.SearchName"
+          },
+          "Recno" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Recno"
+          },
+          "ExternalId" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.ExternalID"
+          },
+          "Active" : {
+            "type" : "boolean",
+            "description" : "Whether the contact is active or not, Tieto 360 Contact.ActiveContact"
+          },
+          "PhoneNumber" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Teleobject1"
+          },
+          "MobilePhone" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Teleobject27"
+          },
+          "Email" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Teleobject6"
+          },
+          "FirstName" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Name2, used for persons"
+          },
+          "LastName" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Name3, used for persons"
+          },
+          "Title" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.Title, used for persons"
+          },
+          "Addresses" : {
+            "type" : "array",
+            "description" : "contact's addresses",
+            "items" : {
+              "$ref" : "#/components/schemas/Address"
+            }
+          },
+          "Created" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.CreatedDate",
+            "format" : "date-time"
+          },
+          "Modified" : {
+            "type" : "string",
+            "description" : "Tieto 360 Contact.ModifiedDate",
+            "format" : "date-time"
+          },
+          "Categories" : {
+            "type" : "array",
+            "description" : "Tieto 360 Contact Categories",
+            "items" : {
+              "$ref" : "#/components/schemas/VahvaContactCategory"
+            }
+          }
+        },
+        "description" : "Tieto 360 contact (contact, private person, enterprise)"
+      },
+      "VahvaContactType" : {
+        "type" : "string",
+        "description" : "Contact types in Tieto 360",
+        "enum" : [ "privatePerson", "contactPerson", "enterprise" ]
+      },
+      "VahvaContactCategory" : {
+        "type" : "string",
+        "description" : "Kontaktin kategoria. Koodiston \"contactCategory\" mukainen kooditus. VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* '1' - Poliitikko\n* ...\n"
+      },
+      "VahvaAddressType" : {
+        "type" : "string",
+        "description" : "Contact types in Tieto 360",
+        "enum" : [ "officeAddress", "postAddress", "privateAddress", "workAddress" ]
+      },
+      "Address" : {
+        "type" : "object",
+        "properties" : {
+          "AddressType" : {
+            "$ref" : "#/components/schemas/VahvaAddressType"
+          },
+          "StreetAddress" : {
+            "type" : "string",
+            "description" : "Tieto 360 Address.Address"
+          },
+          "ZipCode" : {
+            "type" : "string",
+            "description" : "Tieto 360 Address.ZipCode"
+          },
+          "PostOffice" : {
+            "type" : "string",
+            "description" : "Tieto 360 Address.ZipPlace"
+          },
+          "Country" : {
+            "type" : "string",
+            "description" : "Tieto 360 Address.Country (either text or 3-number ISO country code)"
+          }
+        }
+      },
+      "NewCaseData" : {
+        "type" : "object",
+        "properties" : {
+          "Language" : {
+            "$ref" : "#/components/schemas/Language"
+          },
+          "Title" : {
+            "type" : "string",
+            "description" : "The title of the case. Must have 3 characters minimum"
+          },
+          "ClassificationCode" : {
+            "type" : "string",
+            "description" : "The classification code of the case"
+          },
+          "ResponsiblePerson" : {
+            "$ref" : "#/components/schemas/Agent"
+          },
+          "ResponsibleOrganization" : {
+            "$ref" : "#/components/schemas/Agent"
+          },
+          "Contacts" : {
+            "type" : "array",
+            "description" : "case contacts identified by Contact.recno, if any",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          },
+          "OtherId" : {
+            "type" : "array",
+            "description" : "external IDs of the case, if any",
+            "items" : {
+              "$ref" : "#/components/schemas/OtherId"
+            }
+          },
+          "Restriction" : {
+            "$ref" : "#/components/schemas/RestrictionInfo"
+          },
+          "Status" : {
+            "$ref" : "#/components/schemas/CaseStatus"
+          },
+          "RetentionPeriod" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 2.11.1 Säilytysajan pituus, if not given TOS default will be used"
+          },
+          "RetentionReason" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used"
+          }
+        },
+        "description" : "Information needed to create a case"
+      },
+      "NewRecordData" : {
+        "type" : "object",
+        "properties" : {
+          "CaseId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Case.recno. Pakollinen, jos asiakirja liitetään asiaan"
+          },
+          "TaskType" : {
+            "$ref" : "#/components/schemas/ActionType"
+          },
+          "DocumentType" : {
+            "$ref" : "#/components/schemas/DocumentType"
+          },
+          "Language" : {
+            "$ref" : "#/components/schemas/Language"
+          },
+          "Title" : {
+            "type" : "string",
+            "description" : "The title of the document"
+          },
+          "ResponsiblePerson" : {
+            "$ref" : "#/components/schemas/Agent"
+          },
+          "ResponsibleOrganization" : {
+            "$ref" : "#/components/schemas/Agent"
+          },
+          "Receiver" : {
+            "type" : "array",
+            "description" : "revceivers of record, identified by VAHVA Contact.recno, role in Agent",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          },
+          "Contact" : {
+            "type" : "array",
+            "description" : "all kinds of contacts except receivers (forInformation, document contact...), identified by VAHVA Contact.recno, role in Agent",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          },
+          "OtherId" : {
+            "type" : "array",
+            "description" : "external IDs of the document, if any",
+            "items" : {
+              "$ref" : "#/components/schemas/OtherId"
+            }
+          },
+          "Restriction" : {
+            "$ref" : "#/components/schemas/RestrictionInfo"
+          },
+          "Status" : {
+            "$ref" : "#/components/schemas/DocumentStatus"
+          },
+          "RetentionPeriod" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 2.11.1 Säilytysajan pituus, if not given then TOS default will be used"
+          },
+          "RetentionReason" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.2 Säilytysajan peruste, if not given TOS default will be used"
+          },
+          "Document" : {
+            "type" : "array",
+            "description" : "the documents of the record - can be given at creation time, or later",
+            "items" : {
+              "$ref" : "#/components/schemas/Document"
+            }
+          }
+        },
+        "description" : "Tiedot joita tarvitaan asiakirjan luomiseen. Asiakirjan luomisen yhteydessä voidaan antaa myös asiakirjan tiedostot, tai ne voidaan ladata myöhemmin\n"
+      },
+      "NewDocumentData" : {
+        "type" : "object",
+        "properties" : {
+          "RecordId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Document.recno."
+          },
+          "Document" : {
+            "type" : "array",
+            "description" : "the document(s) to add to the record",
+            "items" : {
+              "$ref" : "#/components/schemas/NewDocument"
+            }
+          }
+        },
+        "description" : "Tiedot joita tarvitaan tiedoston/tiedostojen liittämiseen asiakirjaan\n"
+      },
+      "NewDocument" : {
+        "type" : "object",
+        "properties" : {
+          "SahkeDocument" : {
+            "$ref" : "#/components/schemas/NewSahkeDocument"
+          },
+          "DocumentContents" : {
+            "type" : "string",
+            "format" : "binary"
+          }
+        },
+        "description" : "SÄHKE2 6.4.2 Tiedosto + tiedoston sisältö"
+      },
+      "NewSahkeDocument" : {
+        "type" : "object",
+        "properties" : {
+          "NativeId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.1 Identifiointitunnus (VAHVA Document recno)"
+          },
+          "UseType" : {
+            "type" : "string",
+            "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
+            "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
+          },
+          "FileName" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.2.1 (tiedoston) Nimi"
+          },
+          "FilePath" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.2.2 Hakemistopolku"
+          },
+          "FormatName" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.3.1 (formaatin) Nimi"
+          },
+          "FormatVersion" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.3.2 (formaatin) Versio (NOT IMPLEMENTED)"
+          },
+          "MediumId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.4 Median identifiointitunnus (NOT IMPLEMENTED)"
+          },
+          "HashAlgorithm" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi"
+          },
+          "HashValue" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo"
+          },
+          "Encryption" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.7 Salaustapa (NOT IMPLEMENTED)"
+          }
+        },
+        "description" : "SÄHKE2 6.4.2 Tiedosto"
+      },
+      "ErrorInfo" : {
+        "type" : "object",
+        "properties" : {
+          "Errors" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error" : {
+        "type" : "object",
+        "properties" : {
+          "ErrorCode" : {
+            "type" : "string"
+          },
+          "ErrorMessage" : {
+            "type" : "string"
+          }
+        },
+        "description" : "Indicates that transaction was not completed, and the reason for this"
+      },
+      "Case" : {
+        "type" : "object",
+        "properties" : {
+          "Subject" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Keyword"
+            }
+          },
+          "Created" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.2.1 (asian) Avattu/laadittu pvm",
+            "format" : "date-time"
+          },
+          "issued" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.2.2 (asian) Julkistettu pvm (NOT IMPLEMENTED)",
+            "format" : "date-time"
+          },
+          "sent" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 2.2.3 (asian) Lähetetty pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "Modified" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.2.4 (asian) Muokattu pvm",
+            "format" : "date-time"
+          },
+          "available" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 2.2.5 (asian) Saatavilla pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "acquired" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 2.2.6 (asian) Vastaanotettu pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "CaseNumber" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.3 Identifiointitunnus, VAHVAn asianumero"
+          },
+          "NativeId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.3 Identifiointitunnus, VAHVA case.recno"
+          },
+          "OtherId" : {
+            "type" : "array",
+            "description" : "Asian tunnisteet muissa järjestelmissä",
+            "items" : {
+              "$ref" : "#/components/schemas/OtherId"
+            }
+          },
+          "Language" : {
+            "$ref" : "#/components/schemas/Language"
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "SÄHKE 5.2 (asian) Kuvaus"
+          },
+          "Abstract" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.5.1 (asian) Tiivistelmä"
+          },
+          "Restriction" : {
+            "$ref" : "#/components/schemas/RestrictionInfo"
+          },
+          "Title" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.7 Nimike"
+          },
+          "CaseFileRelation" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.10 Suhde NOT IMPLEMENTED",
+            "items" : {
+              "$ref" : "#/components/schemas/CaseFileRelation"
+            }
+          },
+          "RetentionPeriod" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 2.11.1 Säilytysajan pituus"
+          },
+          "RetentionReason" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.2 Säilytysajan peruste"
+          },
+          "RetentionPeriodEnd" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta (NOT IMPLEMENTED)"
+          },
+          "RetentionPeriodCalculationGrounds" : {
+            "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
+          },
+          "Status" : {
+            "$ref" : "#/components/schemas/CaseStatus"
+          },
+          "ClassificationCode" : {
+            "type" : "string",
+            "description" : "Shorthand of the classification code, such as \"03.02.01.01.00\""
+          },
+          "ClassificationScheme" : {
+            "$ref" : "#/components/schemas/ClassificationScheme"
+          },
+          "Function" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.13 Tehtävä"
+          },
+          "Agent" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.14 Toimija",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          },
+          "Type" : {
+            "$ref" : "#/components/schemas/CaseType"
+          },
+          "Finished" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.1.1 Päättymispvm (NOT IMPLEMENTED)",
+            "format" : "date"
+          },
+          "ElectronicNotification" : {
+            "$ref" : "#/components/schemas/ElectronicNotification"
+          },
+          "Action" : {
+            "type" : "array",
+            "description" : "Asiaan liittyvät toimenpiteet (NOT IMPLEMENTED)",
+            "items" : {
+              "$ref" : "#/components/schemas/Action"
+            }
+          },
+          "Custom" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.8 Organisaatiokohtaiset metatiedot  (NOT IMPLEMENTED)",
+            "items" : {
+              "$ref" : "#/components/schemas/CustomMetadata"
+            }
+          }
+        }
+      },
+      "Action" : {
+        "required" : [ "agent", "created", "title", "type" ],
+        "type" : "object",
+        "properties" : {
+          "accepted" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.1.1 Hyväksytty pvm (NOT IMPLEMENTED)",
+            "format" : "date-time"
+          },
+          "issued" : {
+            "type" : "string",
+            "description" : "SÄHKE2 5.1.2 Julkistettu pvm (NOT IMPLEMENTED)",
+            "format" : "date-time"
+          },
+          "created" : {
+            "type" : "string",
+            "description" : "SÄHKE2 5.1.3 Laadittu pvm",
+            "format" : "date-time"
+          },
+          "sent" : {
+            "type" : "string",
+            "description" : "SÄHKE2 5.1.4 Lähetetty pvm (NOT IMPLEMENTED)",
+            "format" : "date-time"
+          },
+          "modified" : {
+            "type" : "string",
+            "description" : "SÄHKE2 5.1.5 Muokattu pvm",
+            "format" : "date-time"
+          },
+          "valid" : {
+            "$ref" : "#/components/schemas/TimePeriod"
+          },
+          "description" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE 5.2 (toimenpiteen) Kuvaus (NOT IMPLEMENTED)"
+            }
+          },
+          "abstract" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE 2.5.1 (toimenpiteen) Tiivistelmä (NOT IMPLEMENTED)"
+            }
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "SÄHKE 5.3 (toimenpiteen) Nimeke"
+          },
+          "custom" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.8 (toimenpiteen) Organisaatiokohtaiset metatiedot (NOT IMPLEMENTED)",
+            "items" : {
+              "$ref" : "#/components/schemas/CustomMetadata"
+            }
+          },
+          "agent" : {
+            "type" : "array",
+            "description" : "SÄHKE2 5.3 Toimija",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/ActionType"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/ActionStatus"
+          },
+          "systemName" : {
+            "type" : "string",
+            "description" : "JHS191 6.4 Tietojärjestelmä. The name of the information system used in the action (NOT IMPLEMENTED)"
+          },
+          "record" : {
+            "type" : "array",
+            "description" : "Toimenpiteeseen liittyvät asiakirjat",
+            "items" : {
+              "$ref" : "#/components/schemas/Record"
+            }
+          }
+        },
+        "description" : "SÄHKE2 5 Toimenpide. Note that there is no separate \"Task\" entity in P360. \"Task\" is actually two pieces of custom metadata in Document object, namely \"Toimenpiteen nimeke\" (such as \"Kanslaiskirjeen vastaanottaminen\" - SÄHKE2 5.3 ) and \"Toimenpiteen tyyppi\" (such as \"06.04.07.00\" - SÄHKE2 5.6). This has a number of consequences * Each Action only has one Record * There can be multiple Actions of the same action type in Case * Some Action data is actually Record data (such as agent) * Only mandatory SÄHKE2 fields are used\n"
+      },
+      "Record" : {
+        "type" : "object",
+        "properties" : {
+          "Subject" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Keyword"
+            }
+          },
+          "Created" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.2.1 (asiakirjan) Avattu/laadittu pvm. Päivämäärä jolloin asiakirja on luotu järjestelmään, ei muokattavissa.",
+            "format" : "date-time"
+          },
+          "Date" : {
+            "type" : "string",
+            "description" : "Asiakirjan päivämäärä. Manuaalisesti syötettävä tieto, ei pakollinen. (NOT IMPLEMENTED FOR POST/PUT)",
+            "format" : "date-time"
+          },
+          "issued" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE 2.2.2 (asiakirjan) Julkistettu pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "Sent" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.2.3 (asiakirjan) Lähetetty pvm (NOT IMPLEMENTED)",
+            "format" : "date-time"
+          },
+          "Modified" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.2.4 (asiakirjan) Muokattu pvm",
+            "format" : "date-time"
+          },
+          "available" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE 2.2.5 (asiakirjan) Saatavilla pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "acquired" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE 2.2.5 (asiakirjan) Vastaanotettu pvm (NOT IMPLEMENTED)",
+              "format" : "date-time"
+            }
+          },
+          "NativeId" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.3 (asiakirjan) Identifiointitunnus, VAHVA document.recno"
+          },
+          "OtherId" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OtherId"
+            }
+          },
+          "Language" : {
+            "$ref" : "#/components/schemas/Language"
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.5 (asiakirjan) Kuvaus (NOT IMPLEMENTED)"
+          },
+          "Abstract" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.5.1 (asiakirjan) Tiivistelmä (NOT IMPLEMENTED)"
+          },
+          "Restriction" : {
+            "$ref" : "#/components/schemas/RestrictionInfo"
+          },
+          "Title" : {
+            "type" : "string",
+            "description" : "SÄHKE 2.7 (asiakirjan) Nimike"
+          },
+          "StorageLocation" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.9 (asiakirjan) Sijaintipaikka"
+          },
+          "RecordRelations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RecordRelation"
+            }
+          },
+          "RetentionPeriod" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 2.11.1 Säilytysajan pituus"
+          },
+          "RetentionReason" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.2 Säilytysajan peruste"
+          },
+          "RetentionPeriodEnd" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta"
+          },
+          "RetentionPeriodCalculationGrounds" : {
+            "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
+          },
+          "Status" : {
+            "$ref" : "#/components/schemas/DocumentStatus"
+          },
+          "Function" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.13 Tehtävä"
+          },
+          "Type" : {
+            "$ref" : "#/components/schemas/DocumentType"
+          },
+          "Accepted" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.1.1 Hyväksytty pvm (NOT IMPLEMENTED)",
+            "format" : "date"
+          },
+          "Gathered" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.1.2 Koottu pvm (NOT IMPLEMENTED)",
+            "format" : "date"
+          },
+          "Valid" : {
+            "$ref" : "#/components/schemas/TimePeriod"
+          },
+          "Authenticity" : {
+            "$ref" : "#/components/schemas/Authenticity"
+          },
+          "SignatureDescription" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.3 Asiakirjan sähköinen allekirjoitus (NOT IMPLEMENTED)"
+          },
+          "Coverage" : {
+            "$ref" : "#/components/schemas/Coverage"
+          },
+          "Audience" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.5 Kohdeyleisö (NOT IMPLEMENTED)"
+            }
+          },
+          "Source" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.6 Lähde (NOT IMPLEMENTED)"
+            }
+          },
+          "Rights" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.7 Oikeudet (NOT IMPLEMENTED)"
+            }
+          },
+          "ProtectionClass" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.9 Suojeluluokka"
+          },
+          "AlternativeTitle" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.10 Vaihtoehtoinen nimike"
+          },
+          "Version" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.11 Versio"
+          },
+          "Document" : {
+            "type" : "array",
+            "description" : "SÄHKE2 6.4.2 Tiedosto",
+            "items" : {
+              "$ref" : "#/components/schemas/Document"
+            }
+          },
+          "Custom" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.8 (asiakirjan) Organisaatiokohtaiset metatiedot  (NOT IMPLEMENTED)",
+            "items" : {
+              "$ref" : "#/components/schemas/CustomMetadata"
+            }
+          },
+          "Agent" : {
+            "type" : "array",
+            "description" : "SÄHKE2 2.14 Toimija",
+            "items" : {
+              "$ref" : "#/components/schemas/Agent"
+            }
+          }
+        },
+        "description" : "SÄHKE2 4 Asiakirjan metatiedot"
+      },
+      "Coverage" : {
+        "type" : "object",
+        "properties" : {
+          "jurisdiction" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.4.1 Hallinnonala (NOT IMPLEMENTED)"
+            }
+          },
+          "spatial" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.4.2 Alueellinen (NOT IMPLEMENTED)"
+            }
+          },
+          "temporal" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 4.4.3 Ajallinen (NOT IMPLEMENTED)"
+            }
+          }
+        },
+        "description" : "SÄHKE2 4.4 Kattavauus (NOT IMPLEMENTED)"
+      },
+      "Authenticity" : {
+        "type" : "object",
+        "properties" : {
+          "Checker" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.2.1 Tarkastaja"
+          },
+          "Date" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.2.2 Aikamääre",
+            "format" : "date"
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.2.3 Kuvaus"
+          }
+        },
+        "description" : "SÄHKE2 4.2 Asiakirjan alkuperäisyys ja eheys todettu"
+      },
+      "TimePeriod" : {
+        "type" : "object",
+        "properties" : {
+          "Start" : {
+            "type" : "string",
+            "description" : "Ajanjakson alku",
+            "format" : "date"
+          },
+          "End" : {
+            "type" : "string",
+            "description" : "Ajanjakon loppu",
+            "format" : "date"
+          }
+        },
+        "description" : "Ajanjakso"
+      },
+      "RecordRelation" : {
+        "type" : "object",
+        "properties" : {
+          "replaces" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 (asiakirja) Korvaa/Korvattu (NOT IMPLEMENTED)"
+          },
+          "isReplacedBy" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 (asiakirja) Korvaa/Korvattu (NOT IMPLEMENTED)"
+          },
+          "references" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 2.10.2 (asiakirja) Viittaa/On  viitattu (NOT IMPLEMENTED)"
+          },
+          "isReferencedBy" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 2.10.2 (asiakirja) Viittaa/On viitattu (NOT IMPLEMENTED)"
+          },
+          "required" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.1 (asiakirja) Pakollinen/Liittyy pakollisena (NOT IMPLEMENTED)"
+          },
+          "isRequired" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.1 (asiakirja) Pakollinen/Liittyy pakollisena (NOT IMPLEMENTED)"
+          },
+          "hasPart" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.2 (asiakirja) Sisältää/Kuuluu (NOT IMPLEMENTED)"
+          },
+          "isPartOf" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.2 (asiakirja) Sisältää/Kuuluu (NOT IMPLEMENTED)"
+          },
+          "hasFormat" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.3 Myöhempi formaatti/Aikaisempi formaatti (NOT IMPLEMENTED)"
+          },
+          "isFormatOf" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.3 Myöhempi formaatti/Aikaisempi formaatti (NOT IMPLEMENTED)"
+          },
+          "hasVersion" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.4 Vanhempi versio/Uudempi versio (NOT IMPLEMENTED)"
+          },
+          "isVersionOf" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.4 Vanhempi versio/Uudempi versio (NOT IMPLEMENTED)"
+          },
+          "hasRedaction" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.5 Julkinen (\"mustattu\") versio/Salassa pidettävää tietoa sisältävä versio (NOT IMPLEMENTED)"
+          },
+          "isRedactionOf" : {
+            "type" : "string",
+            "description" : "SÄHKE2 4.8.5 Julkinen (\"mustattu\") versio/Salassa pidettävää tietoa sisältävä versio (NOT IMPLEMENTED)"
+          }
+        },
+        "description" : "SÄHKE2 4.8 Suhde (NOT IMPLEMENTED)"
+      },
+      "SahkeDocument" : {
+        "type" : "object",
+        "properties" : {
+          "NativeId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.1 Identifiointitunnus (VAHVA Document recno)"
+          },
+          "UseType" : {
+            "type" : "string",
+            "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
+            "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
+          },
+          "FileName" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.2.1 (tiedoston) Nimi"
+          },
+          "FilePath" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.2.2 Hakemistopolku"
+          },
+          "FormatName" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.3.1 (formaatin) Nimi"
+          },
+          "formatVersion" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.3.2 (formaatin) Versio (NOT IMPLEMENTED)"
+          },
+          "mediumId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.4 Median identifiointitunnus (NOT IMPLEMENTED)"
+          },
+          "HashAlgorithm" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi"
+          },
+          "HashValue" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo"
+          },
+          "encryption" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.4.7 Salaustapa (NOT IMPLEMENTED)"
+          }
+        },
+        "description" : "SÄHKE2 6.4.2 Tiedosto"
+      },
+      "Document" : {
+        "type" : "object",
+        "properties" : {
+          "SahkeDocument" : {
+            "$ref" : "#/components/schemas/SahkeDocument"
+          },
+          "DocumentContents" : {
+            "type" : "string",
+            "format" : "binary"
+          }
+        },
+        "description" : "SÄHKE2 6.4.2 Tiedosto + tiedoston sisältö"
+      },
+      "ElectronicNotification" : {
+        "required" : [ "acceptanceDate", "acceptanceDescription" ],
+        "type" : "object",
+        "properties" : {
+          "acceptanceDate" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.1 Suostumusajankohta (NOT IMPLEMENTED)",
+            "format" : "date"
+          },
+          "acceptanceDescription" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.2 Suostumuskuvaus (NOT IMPLEMENTED)"
+          },
+          "notificationPeriod" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.3 Tiedoksiantoperiodi (NOT IMPLEMENTED)"
+          },
+          "delivered" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.4 Tiedoksiannon hakeminen (NOT IMPLEMENTED)",
+            "format" : "date"
+          },
+          "deliveryDate" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.5 Muun tiedoksiannon (NOT IMPLEMENTED) lähettämispvm",
+            "format" : "date"
+          },
+          "arrivalDate" : {
+            "type" : "string",
+            "description" : "SÄHKE2 3.2.6 Muun tiedoksiannon saapumispvm (NOT IMPLEMENTED)",
+            "format" : "date"
+          }
+        },
+        "description" : "SÄHKE2 3.2 Sähköinen tiedoksianto (NOT IMPLEMENTED)"
+      },
+      "ClassificationScheme" : {
+        "type" : "object",
+        "properties" : {
+          "MainFunction" : {
+            "$ref" : "#/components/schemas/FunctionCode"
+          },
+          "FunctionClassifiction" : {
+            "$ref" : "#/components/schemas/ClassificationScheme_FunctionClassifiction"
+          }
+        },
+        "description" : "NOT IMPLEMENTED"
+      },
+      "FunctionClassification" : {
+        "type" : "object",
+        "properties" : {
+          "Function" : {
+            "$ref" : "#/components/schemas/FunctionCode"
+          },
+          "SubFunctions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SubFunction"
+            }
+          }
+        }
+      },
+      "FunctionCode" : {
+        "type" : "object",
+        "properties" : {
+          "FunctionTitle" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.3.5 Nimeke"
+          },
+          "FunctionCode" : {
+            "type" : "string",
+            "description" : "SÄHKE2 6.3.4 Tunnus"
+          }
+        }
+      },
+      "SubFunction" : {
+        "type" : "object",
+        "properties" : {
+          "Function" : {
+            "$ref" : "#/components/schemas/FunctionCode"
+          },
+          "SubFunctions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SubFunction"
+            }
+          }
+        }
+      },
+      "CaseFileRelation" : {
+        "type" : "object",
+        "properties" : {
+          "Replaces" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 Korvaa/Korvattu"
+          },
+          "IsReplacedBy" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 Korvaa/Korvattu"
+          },
+          "References" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 2.10.2 Viittaa/On viitattu"
+          },
+          "IsReferencedBy" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.10.1 2.10.2 Viittaa/On viitattu"
+          }
+        },
+        "description" : "SÄHKE2 2.10 Suhde"
+      },
+      "Agent" : {
+        "type" : "object",
+        "properties" : {
+          "Role" : {
+            "$ref" : "#/components/schemas/AgentRole"
+          },
+          "Name" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.14.2 Henkilö"
+          },
+          "CorporateName" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.14.3 Yhteisö"
+          },
+          "OtherId" : {
+            "$ref" : "#/components/schemas/OtherId"
+          }
+        },
+        "description" : "SÄHKE2 2.14 Toimija + laajennettu OtherId -tiedolla"
+      },
+      "CustomMetadata" : {
+        "type" : "object",
+        "properties" : {
+          "Name" : {
+            "type" : "string",
+            "description" : "metadata name"
+          },
+          "Type" : {
+            "type" : "string",
+            "description" : "metadata type",
+            "enum" : [ "string", "integer", "date" ]
+          },
+          "Value" : {
+            "type" : "string",
+            "description" : "metadata value"
+          }
+        }
+      },
+      "PublicityClass" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.6.1 Julkisuusluokka (Restriction.PublicityClass) - with addition of \"Ei-julkinen\" from JHS191.\nThe latter is used to indicate situation in which publicity is not public for some time, but will change\nto public later on (see PublicityClassChange)\n* Julkinen = Public\n* Osittain salassa pidettävä = Partly confidential\n* Salassa pidettävä = Confidential\n* Ei-julkinen = Not public for the time being, will change into public later\n",
+        "enum" : [ "Julkinen", "Osittain salassapidettävä", "Salassa pidettävä", "Ei-julkinen" ]
+      },
+      "PublicityClassChange" : {
+        "type" : "string",
+        "description" : "JHS191 7.17 Julkisuusluokan muutos - the action triggering change in publicity class. Example values from VNK\nTODO selvitä oikea koodaus esimerkkiin\n* \"Asian ratkaisu\" = triggered upon case closure\n* \"Päätöksenteko\" = triggerd upon decision\n* \"Päätöksen allekirjoitus\" = triggered when decision has been signed\n"
+      },
+      "ProtectionLevel" : {
+        "type" : "string",
+        "description" : "SÄHKE2 Metatietomalli: 2.6.5 Suojaustaso (Restriction.ProtectionLevel)\nSee [Julkisuuslaki 9§](https://www.finlex.fi/fi/laki/ajantasa/2010/20100681) \n* I = Protection level 1, unauthorized access can cause great damage to public interests\n* II = Protection level 2, unauthorized access can cause significant damage to public interests\n* III = Protection level 2, unauthorized access can cause damage to public or private interests\n* IV = Protection level 4, unauthorized access can cause some harm to public or private interests\n",
+        "enum" : [ "I", "II", "III", "IV" ]
+      },
+      "SecurityClass" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.6.6 Turvallisuusluokka (Restriction.SecurityClass)\n* Turvallisuusluokka I - TOP SECRET\n* Turvallisuusluokka II - SECRET\n* Turvallisuusluokka III - CONFIDENTIAL\n* Turvallisuusluokka IV - RESTRICTED\n* Ei turvallisuusluokiteltu - NOT CLASSIFIED\n",
+        "enum" : [ "Turvallisuusluokka I", "Turvallisuusluokka II", "Turvallisuusluokka III", "Turvallisuusluokka IV", "Ei turvallisuusluokiteltu" ]
+      },
+      "PersonalDataNature" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.6.7 Henkilötietoja. Indicates whether personal data, or possibly sensitive personal data, is involved. Coded as follows (yes, strings in Finnish)\n* \"Ei sisällä henkilötietoja\" = does not contain personal information\n* \"Sisältää henkilötietoja\" = contains personal information\n* \"Sisältää arkaluonteisia henkilötietoja\" = contains sensitive personal information\n",
+        "enum" : [ "Ei sisällä henkilötietoja", "Sisältää henkilötietoja", "Sisältää arkaluonteisia henkilötietoja" ]
+      },
+      "RetentionPeriodCalculationGrounds" : {
+        "type" : "string",
+        "description" : "JHS191 S.10 Säilytysajan laskentaperuste. Indicates what event is considered the start of retention perios calculation. Recommended codes are as follows, other codes are allowed\n* \"Asian lopullinen ratkaisu\" = calculation start when the final decision in case has been done\n* \"Säilytysjärjestelmään siirto\" = calculation starts from transfer to archiving system\n"
+      },
+      "RestrictedPerson" : {
+        "type" : "object",
+        "properties" : {
+          "Name" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.8.1 Nimi"
+          },
+          "Ssn" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.8.2 Henkilötunnus",
+            "format" : "hetu"
+          },
+          "ElectronicId" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.8.3 Sähköinen asiointitunnus"
+          }
+        }
+      },
+      "AccessRight" : {
+        "type" : "object",
+        "properties" : {
+          "Name" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.10.1 Henkilö"
+          },
+          "Role" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.10.2 Rooli"
+          },
+          "AccessRightDescription" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.10.3 Kuvaus"
+          }
+        }
+      },
+      "RestrictionInfo" : {
+        "type" : "object",
+        "properties" : {
+          "PublicityClass" : {
+            "$ref" : "#/components/schemas/PublicityClass"
+          },
+          "PublicityClassChange" : {
+            "$ref" : "#/components/schemas/PublicityClassChange"
+          },
+          "SecurityPeriod" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 2.6.2 Salassapitoaika"
+          },
+          "SecurityPeriodEnd" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.6.3 Salassapidon päättymisajankohta",
+            "format" : "date"
+          },
+          "ProtectionLevel" : {
+            "$ref" : "#/components/schemas/ProtectionLevel"
+          },
+          "SecurityClass" : {
+            "$ref" : "#/components/schemas/SecurityClass"
+          },
+          "ContainsPersonalData" : {
+            "$ref" : "#/components/schemas/PersonalDataNature"
+          },
+          "Persons" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RestrictedPerson"
+            }
+          },
+          "Owners" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "SÄHKE2 2.6.9 Omistaja"
+            }
+          },
+          "AccessRights" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AccessRight"
+            }
+          }
+        },
+        "description" : "SÄHKE2 2.6 Käyttörajoitus"
+      },
+      "Code" : {
+        "type" : "object",
+        "properties" : {
+          "Lang" : {
+            "type" : "string",
+            "description" : "language of the code, ISO 2-letter language code",
+            "enum" : [ "fi", "sv", "en" ]
+          },
+          "Recno" : {
+            "type" : "string",
+            "description" : "technical id of the code requested."
+          },
+          "Code" : {
+            "type" : "string",
+            "description" : "code itself"
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "human-readable description in the specified langauage"
+          }
+        },
+        "description" : "Coded value in specified langauage"
+      },
+      "OtherId" : {
+        "type" : "object",
+        "properties" : {
+          "OtherIdType" : {
+            "type" : "string",
+            "description" : "Koodiston \"otherIdType\" mukaiset vaihtoehdot. VNK-esimerkki\n* vahvaDocumentNumber\n* eduskuntaTunnus\n* vahvaContactRecno\n* hankeikkunaKohdeTunnus\n* unspecified\n"
+          },
+          "OtherId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Language" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.4 Kieli, koodiston \"language\" mukaiset vaihtoehdot. VNK-esimerkki suomeksi\n* 'fi' - suomi\n* 'sv' - ruotsi\n* 'en' - englanti\n* 'fr' - ranska\n* 'de' - saksa\n* 'ru' - venäjä\n* 'bg' - bulgaria\n* 'et' - viro\n* 'es' - espanja\n* 'nl' - hollangi\n* 'ga' - irlanti\n* 'it' - italia\n* 'el' - kreikka\n* 'lv' - liettua\n* 'mt' - malta\n* 'pl' - puola\n* 'ro' - romania\n* 'sk' - slovakia\n* 'sl' - slovenia\n* 'da' - tanska\n* 'cs' - tsekki\n* 'se' - pohjois-aame\n"
+      },
+      "CaseStatus" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.12 (asian) Tila, koodiston \"caseStatus\" (/api/v1/Codes/caseStatus) mukaiset vaihtoehdot (Code.Recno)\n"
+      },
+      "DocumentStatus" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.12 (asiakirjan) Tila. Koodiston \"documentStatus\" mukainen kooditus. VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* 'K' - Käsitelty\n* 'P' - Päätetty\n* 'H' - Hyväksytty\n* 'M' - Mitätöity\n* 'V' - Valmis allekirjoitettavaksi\n"
+      },
+      "ActionStatus" : {
+        "type" : "string",
+        "description" : "JHS191 6.3 Käsittelyprosessin tila. Coded value \"actionStatus\". VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* \"Avattu\"\n* \"Vireillä\"\n* \"Valmistelussa\"\n* \"Ratkaistu\" \n* \"Toimitettu tiedoksi\"\n* \"Toimeenpantavana\" \n* \"Muutoksenhaku\"\n* \"Seurannassa\"\n* \"Päätetty\" \n* \"Avattu uudelleen\" \n* \"Siirretty\" \n* \"Hävitetty\"\n"
+      },
+      "DocumentType" : {
+        "type" : "object",
+        "properties" : {
+          "Type" : {
+            "type" : "string",
+            "description" : "SÄHKE2 2.15 (asiakirjan) Tyyppi",
+            "example" : "Kannanotto"
+          },
+          "TypeSpecifier" : {
+            "type" : "string",
+            "description" : "JHS 191 asiakirjatyypin tarkenne (NOT IMPLEMENTED)",
+            "example" : "Neuvoteltu VM:n kanta"
+          },
+          "TypeCode" : {
+            "type" : "string",
+            "description" : "dokumenttityypin koodi",
+            "example" : "09.00.00.00.06.01"
+          }
+        }
+      },
+      "ActionType" : {
+        "type" : "string",
+        "description" : "SÄHKE2 5.6 (toimenpiteen) Tyyppi. Stored in TOS. Not a coded value.\n"
+      },
+      "CaseType" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.15 (asian) Tyyppi. Koodiston \"caseType\" mukainen kooditus TODO selvitä oikea koodaus esimerkkiin (NOT IMPLEMENTED)\n"
+      },
+      "AgentRole" : {
+        "type" : "string",
+        "description" : "SÄHKE2 2.14.1 Rooli. Koodiston \"agentRole\" mukainen kooditus. VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus\n* 'RP' - Vastuuhenkilö\n* 'RO' - Vastuuorganisaatio\n* 'SE' - Lähettäjä\n* 'RE' - Vastaanottaja\n* 'CC' - Kopio\n* 'BC' - Piilokopio\n* 'CO' - Kontakti\n* 'PA' - Osallinen\n* 'CU' - Hakija\n* ...\n"
+      },
+      "TechnicalId" : {
+        "maxLength" : 16,
+        "type" : "string",
+        "description" : "Technical ID (recno) in VAHVA (NOT IMPLEMENTED)"
+      },
+      "Session" : {
+        "type" : "object",
+        "properties" : {
+          "sessionId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "PlannedStart" : {
+            "type" : "string",
+            "description" : "Planned start of the session",
+            "format" : "datetime"
+          },
+          "ActualStart" : {
+            "type" : "string",
+            "description" : "Actual start of the session",
+            "format" : "datetime"
+          },
+          "Place" : {
+            "maxLength" : 100,
+            "type" : "string",
+            "description" : "Place of the session",
+            "example" : "[Helsinki, Naantali]"
+          },
+          "Type" : {
+            "$ref" : "#/components/schemas/SessionType"
+          },
+          "Status" : {
+            "$ref" : "#/components/schemas/SessionStatus"
+          },
+          "Extra" : {
+            "type" : "boolean",
+            "description" : "Indicated wheter session is scheduled or and extra session"
+          },
+          "SessionIdentifier" : {
+            "maxLength" : 32,
+            "type" : "string",
+            "description" : "Session identifier",
+            "example" : "29/1995"
+          },
+          "ChangedTime" : {
+            "type" : "string",
+            "description" : "Last update timestamp",
+            "format" : "datetime"
+          },
+          "Removed" : {
+            "type" : "boolean",
+            "description" : "True, is the session has been deleted, false otherwise"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "ListItem" : {
+        "type" : "object",
+        "properties" : {
+          "CaseId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "CaseTypeName" : {
+            "type" : "string",
+            "description" : "Case type written out",
+            "example" : "Hallituksen esitys"
+          },
+          "pParliamentId" : {
+            "type" : "string",
+            "description" : "Parliament id, if any",
+            "example" : "HE 17/2018"
+          },
+          "Presenter" : {
+            "$ref" : "#/components/schemas/PersonInfo"
+          },
+          "Proposal" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Presenter's propsal for approval",
+            "example" : "Esitetään asian hyväksymistä / Approval is proposed"
+          },
+          "SessionId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "AdditionalInfo" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Any additional info for the list item",
+            "example" : "Esitetään asian hyväksymistä / Approval is proposed"
+          },
+          "ListItemId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "Minister" : {
+            "$ref" : "#/components/schemas/MinisterInfo"
+          },
+          "MinistryName" : {
+            "maxLength" : 255,
+            "type" : "string",
+            "description" : "The full name of the presenters' ministry",
+            "example" : "Opetus- ja kulttuuriministeriö / Ministry of Education and Culture"
+          },
+          "MinistryShortName" : {
+            "maxLength" : 10,
+            "type" : "string",
+            "description" : "The abbreviation of the presenters' ministry",
+            "example" : "OKM"
+          },
+          "TitleFi" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "The title of the case in the list.",
+            "example" : "Hallituksen esitys mustikkalaista"
+          },
+          "AdditionalDecisionInfo" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Additional info regarding the decision taken. After the case has been handled (status = written or above) contains the name of the decision, too.",
+            "example" : "Tasavallan presidentti hyväksyi esityksen"
+          },
+          "DecisionName" : {
+            "maxLength" : 100,
+            "type" : "string",
+            "description" : "The written out decision code",
+            "example" : "Tasavallan presidentti hyväksyi esityksen"
+          },
+          "TitleSv" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Title of the list item in Swedish"
+          },
+          "Contents" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "The contents of the list item"
+          },
+          "ListStatus" : {
+            "$ref" : "#/components/schemas/ListStatus"
+          },
+          "Jurisdiction" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Jurisdiction related to the list item"
+          },
+          "Effects" : {
+            "maxLength" : 2000,
+            "type" : "string",
+            "description" : "Effects of the case"
+          },
+          "PublicEmbargo" : {
+            "type" : "string",
+            "description" : "Indicates the time when the list item can be made public.\n",
+            "format" : "datetime"
+          },
+          "Documents" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ListDocument"
+            }
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n\nSession list item information. The amount of information returned depends on list item state.\nIf list item state is 4 (decision written/päätöskirjattu), 5 (decision finalized/pöytäkirjattu) or 6 (decision checked/tarkistettu), full information is returned. Otherwise only the following is returned\n* caseId\n* presenter\n* sessionId\n* titleFi\n* titleSv\n* ministryShortName\n* ministryName\n"
+      },
+      "File" : {
+        "type" : "object",
+        "properties" : {
+          "documentId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "fileName" : {
+            "type" : "string",
+            "description" : "The name of the file",
+            "example" : "vnl_vnksarlin.jpg"
+          },
+          "mimeType" : {
+            "type" : "string",
+            "description" : "MIME type of the file",
+            "example" : "image/jpeg"
+          },
+          "file" : {
+            "type" : "string",
+            "description" : "file contents as base64 encoded string",
+            "format" : "byte"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "Keyword" : {
+        "type" : "object",
+        "properties" : {
+          "Title" : {
+            "type" : "string",
+            "description" : "Keyword title",
+            "example" : "valtioneuvosto"
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "Keyword description (URI if imported from ontology)",
+            "example" : "http://www.yso.fi/onto/juho/p1584"
+          },
+          "Recno" : {
+            "type" : "string",
+            "description" : "Keyword recno (identifier)",
+            "example" : "200123"
+          },
+          "Language" : {
+            "type" : "string",
+            "description" : "Keyword language (default Finnish)",
+            "example" : "FIN"
+          }
+        },
+        "description" : "Keyword object"
+      },
+      "FileInfo" : {
+        "type" : "object",
+        "properties" : {
+          "DocumentId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "FileName" : {
+            "type" : "string",
+            "description" : "The name of the file",
+            "example" : "vnl_vnksarlin.jpg"
+          },
+          "MimeType" : {
+            "type" : "string",
+            "description" : "MIME type of the file",
+            "example" : "image/jpeg"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "ListDocument" : {
+        "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
+        "type" : "object",
+        "properties" : {
+          "DocumentType" : {
+            "type" : "string",
+            "description" : "VAHVA document type identifier. \n"
+          },
+          "DocumentTypeNameFi" : {
+            "maxLength" : 255,
+            "type" : "string",
+            "description" : "Written-out name of the document type in Finnish. It has been noted that these \"publicity facing\" document types should\nbe written out using different document type names than those within VAHVA.\n",
+            "example" : "Hallituksen esitys"
+          },
+          "documentTypeNameSv" : {
+            "maxLength" : 255,
+            "type" : "string",
+            "description" : "Written-out name of the document type in Swedisah.\n",
+            "example" : "Regeringsproposition"
+          },
+          "listId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "containsPersonalData" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the document in question contains personal data or sensitive personal data (SÄHKE2 2.6.7)"
+          },
+          "ordinal" : {
+            "type" : "integer",
+            "description" : "The ordinal number of the document in the case",
+            "example" : 1
+          },
+          "documentId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "documentFormatType" : {
+            "type" : "string",
+            "description" : "* 1 - sähköinen versio / electronic document\n* 2 - ainoastaan paperilla / paper only\n",
+            "enum" : [ "1", "2" ]
+          },
+          "documentTitle" : {
+            "maxLength" : 510,
+            "type" : "string",
+            "description" : "The name of the document",
+            "example" : "Koeliite ihan vain kokeiluja varten"
+          },
+          "fileName" : {
+            "maxLength" : 20,
+            "type" : "string",
+            "description" : "Name of the file, id + pdf",
+            "example" : "090000018008b95c.pdf"
+          },
+          "lang" : {
+            "type" : "string",
+            "description" : "2-letter ISO language code\nTODO Should be unified across all interfaces, put common types into imported file\n",
+            "enum" : [ "fi", "sv", "fr", "en", "de" ]
+          },
+          "correctionUnderway" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the a correction to the document is underway (but the list item decision \nhas still been written / \"asia on päätöskirjattu\"). \n",
+            "default" : false
+          },
+          "caseId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "MinisterInfo" : {
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "maxLength" : 128,
+            "type" : "string"
+          },
+          "lastName" : {
+            "maxLength" : 128,
+            "type" : "string"
+          },
+          "title" : {
+            "maxLength" : 256,
+            "type" : "string"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "PersonInfo" : {
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "maxLength" : 128,
+            "type" : "string"
+          },
+          "lastName" : {
+            "maxLength" : 128,
+            "type" : "string"
+          },
+          "title" : {
+            "maxLength" : 256,
+            "type" : "string"
+          },
+          "phoneNumber" : {
+            "maxLength" : 32,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 32,
+            "type" : "string"
+          }
+        },
+        "description" : "(NOT IMPLEMENTED)\n"
+      },
+      "SessionType" : {
+        "type" : "string",
+        "description" : "(NOT IMPLEMENTED)\n* 'VN' - Valtioneuvosto / government plenary session\n* 'TP' - Tasavallan Presidnetti / presidential session\n* 'RV' - Raha-asianvaliokunta /  monetary session\n",
+        "enum" : [ "VN", "TP", "RV" ]
+      },
+      "RenditionType" : {
+        "type" : "string",
+        "description" : "(NOT IMPLEMENTED)\n* 'word' - Microsoft Word DOCX format\n* 'pdf' - Portable document format\n* 'xml' - XML, that is, structured document\n* 'original' - original document type of the document\n",
+        "enum" : [ "word", "pdf", "xml", "original" ]
+      },
+      "ListStatus" : {
+        "type" : "string",
+        "description" : "Indicates status of list item. TODO check whether the coding is the same for list and session status (NOT IMPLEMENTED)\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress\n",
+        "enum" : [ "1", "2", "4", "5", "6", "7" ]
+      },
+      "SessionStatus" : {
+        "type" : "string",
+        "description" : "Indicates session status (NOT IMPLEMENTED)\n* '1' - luotu / created\n* '2' - lukittu / locked\n* '4' - päätöskirjattu / decision written\n* '5' - pöytäkirjattu / decision approved\n* '6' - tarkastettu / decision checked\n* '7' - päätöskirjaus aloitettu / decision writing in progress",
+        "enum" : [ "1", "2", "4", "5", "6", "7" ]
+      },
+      "inline_response_200" : {
+        "type" : "object",
+        "properties" : {
+          "codes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Code"
+            }
+          }
+        },
+        "example" : "{\"codes\":[{\"lang\":\"fi\",\"code\":\"vahvaCaseNumber\",\"description\":\"Vahvan asianumero\"},{\"lang\":\"fi\",\"code\":\"vahvaDocumentNumber\",\"description\":\"Vahvan asiakirjanumero\"},{\"lang\":\"fi\",\"code\":\"eduskuntaTunnus\",\"description\":\"Asian edustkuntatunniste\"},{\"lang\":\"fi\",\"code\":\"vahvaContactRecno\",\"description\":\"Vahvan kontaktin tekninen tunniste\"},{\"lang\":\"fi\",\"code\":\"hankeikkunaKohdeTunnus\",\"description\":\"Hankeikkunan kohteen tekninen tunniste\"},{\"lang\":\"fi\",\"code\":\"unspecified\",\"description\":\"Muu tunniste\"}]}"
+      },
+      "body" : {
+        "required" : [ "caseData" ],
+        "type" : "object",
+        "properties" : {
+          "caseData" : {
+            "$ref" : "#/components/schemas/Case"
+          }
+        }
+      },
+      "body_1" : {
+        "required" : [ "newCaseData" ],
+        "type" : "object",
+        "properties" : {
+          "newCaseData" : {
+            "$ref" : "#/components/schemas/NewCaseData"
+          }
+        }
+      },
+      "body_2" : {
+        "required" : [ "recordData" ],
+        "type" : "object",
+        "properties" : {
+          "recordData" : {
+            "$ref" : "#/components/schemas/Record"
+          }
+        }
+      },
+      "body_3" : {
+        "required" : [ "newRecordData" ],
+        "type" : "object",
+        "properties" : {
+          "newRecordData" : {
+            "$ref" : "#/components/schemas/NewRecordData"
+          }
+        }
+      },
+      "body_4" : {
+        "required" : [ "documentData" ],
+        "type" : "object",
+        "properties" : {
+          "documentData" : {
+            "$ref" : "#/components/schemas/Document"
+          }
+        }
+      },
+      "body_5" : {
+        "required" : [ "newDocumentData" ],
+        "type" : "object",
+        "properties" : {
+          "newDocumentData" : {
+            "$ref" : "#/components/schemas/NewDocumentData"
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "type" : "object",
+        "properties" : {
+          "session" : {
+            "$ref" : "#/components/schemas/Session"
+          },
+          "lists" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ListItem"
+            }
+          }
+        }
+      },
+      "inline_response_200_2" : {
+        "type" : "object",
+        "properties" : {
+          "listItemId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "fileInfo" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/File"
+            }
+          }
+        }
+      },
+      "inline_response_200_3_documentIds" : {
+        "type" : "object",
+        "properties" : {
+          "documentId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }
+      },
+      "inline_response_200_3" : {
+        "type" : "object",
+        "properties" : {
+          "listItemId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "documentIds" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/inline_response_200_3_documentIds"
+            }
+          }
+        }
+      },
+      "inline_response_200_4_listItems" : {
+        "type" : "object",
+        "properties" : {
+          "listItemId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "caseNumber" : {
+            "type" : "string",
+            "description" : "Case number",
+            "example" : "VN/30/2018"
+          },
+          "documentIds" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TechnicalId"
+            }
+          }
+        }
+      },
+      "inline_response_200_4" : {
+        "type" : "object",
+        "properties" : {
+          "sessionId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "listItems" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/inline_response_200_4_listItems"
+            }
+          }
+        }
+      },
+      "inline_response_200_5" : {
+        "type" : "object",
+        "properties" : {
+          "fileInfo" : {
+            "$ref" : "#/components/schemas/FileInfo"
+          },
+          "fileContents" : {
+            "type" : "string",
+            "description" : "file contents",
+            "format" : "byte"
+          }
+        }
+      },
+      "ClassificationScheme_FunctionClassifiction" : {
+        "type" : "object",
+        "properties" : {
+          "Function" : {
+            "$ref" : "#/components/schemas/FunctionCode"
+          },
+          "SubFunctions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SubFunction"
+            }
+          }
+        }
+      }
+    }
+  }
+}
