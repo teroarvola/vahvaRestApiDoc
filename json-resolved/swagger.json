@@ -2,7 +2,7 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "VAHVA rest API",
-    "description" : "# VAHVA system public API  \nThe API has been designed with the following principles in mind\n* Interface should be SÄHKE2 compliant, i.e support full SÄHKE2 metadata model and enforce mandatory metadata\n* Interface should be usable without changes in all VAHVA installations (VNK VAHVA, VirastoVahva)\n* Installation specific metadata can be used\n* Use component-based schema definitions to make changes easier \n# General usage guidelines\nClient always needs to authenticate with the server and get a session key. Authentication happens with basic authentication with system-specific credentials. \n## General read usage\nReading cases and documents happens in three stages as follows\n* Read case list with GET /api/v1/cases => case metadata\n  * Here API user must be prepared to handle situations where not all data is returned in a single call. This may be the case when maxRows (default is 100) cases is returned with first call. If this happens, further calls with page and maxRows parameters set properly may be required. \n  * Server side is stateless, all state needs to be handled by the client\n* When case is selected, get case details with GET /api/v1/cases/{caseRecno} => case, record and document metadata\n* When a document (or rather, a relevant rendition of a case record) in case is selected, get document contents with GET /api/v1/documents/{documentRecno}\n## General write usage\nCreating new cases always requires the following pieces of information (PUT /api/v1/cases)\n* Technical id of the responsible organization (Contact.recno - either hard coded or fetched with GET /api/v1/contacts)\n* Technical is the responsible person (Contact.recno, see above)\n* Classification code of the new case\n* Language of the case\n* Title of the case\n* Status of the case\n* Information regarding restriction status of the case (such as publicity of the case)\n* Once a case has been created, new records (PUT /api/v1/records) can be added to the case, and new documents (PUT /api/v1/documents) can be added to the record. Records have a number of required pieces of information. They are quite similar to case mandatory information, with classification code replaced by document type.\n## Date formats\nDate format is according to SFS-EN 28601 standard, which is very similar to ISO 8601 format. The format is strictly:\n  * **yyyy-MM-ddThh:mm:sszzz**\n  * example: 2019-05-03T12:17:00+03:00\n  \n  When passing date values in URL query string you need to encode the value. **The plus sign in timezone will not work as it will interpreted as space, so you need to encode it to %2B.**\n  \n# Implementation schedule based on business needs\n* Stage 2a2\n    * Hankeikkuna, LVM Liferay, YJA need to read cases and documents from VNK VAHVA\n        * GET /api/v1/cases/{caseRecno}\n        * GET /api/v1/cases - with some search criteria, others maybe 2b\n        * GET /api/v1/record/{recordRecno}\n    * Buketti needs to insert new cases and documents\n        * PUT /api/v1/cases\n        * PUT /api/v1/records\n        * PUT /api/v1/documents\n        * GET /api/v1/contacts/{contactRecno} - possibly\n        * GET /api/v1/contacts/{contactEmail} - possibly\n        * GET /api/v1/codes/{codeName} - possibly\n    * General needs, most likely\n        * GET /api/v1/records - with at least some search criteria\n* Stage 2b \n    * General integration needs, most likely\n        * GET /api/v1/contacts\n        * GET /api/v1/cases - rest of the search criteria\n        * GET /api/v1/records - rest of the search criteria\n        * POST /api/v1/cases\n        * POST /api/v1/records\n        * POST /api/v1/documents\n        * GET /api/v1/classifications\n        * GET /api/v1/functions/{functionCode}\n        * GET /api/v1/documenttypes/{functionCode}\n# ToDo / Improvement needed on following\n* Find out the actual coding example from VNK, marked as \"TODO\" towards the end of spec\n* Unify interface description language to English, now a little bit mixed English and Finnish\n* It would be beneficial to document mappings to Tieto 360 data model. Tieto?\n# Changes\n* Changed Case, Action, Record and Document timestamps to date-time instead of date / Riku Sarlin 2018-06-14\n* Unified all operations under plural substantives / Riku Sarlin 2018-06-14\n* Added further search parameters to case and record search (all dates, roles, contacts, statuses) based on LVM needs / Riku Sarlin 2018-06-14\n* Added GET /api/v1/session and DELETE /api/v1/session operations and authentication to operations / Riku Sarlin 2018-07-09\n* Some changes to ensure proper performance / Riku Sarlin 2018-07-10\n  * Changed paging to use recnos, lists always returned in recno order. The solution puts some burden on paging to client side - client needs to track \"first\" and \"last\" recnos in paging\n  * GET /api/v1/cases only returns case information - no tasks, records or documents. All case information can then be fetched with GET /api/v1/cases/{caseRecno}\n  * Added separate GET /api/v1/documents/{documentRecno} operation that returns document contents, too (GET /api/v1/records/{recordRecno} now just returns document metadata)\n  * Modified operations so that classification is returned and given by a single string of type \"02.01.01.00\" rather than a complex structured element. GET /api/v1/classifications still returns the structured element, and case GET operations can return it, but by default do not.\n  * Added some sanity checks to GET /api/v1/cases and GET /api/v1/records parameters to ensure proper performance and sensible result set sizes\n* Took /api/v1/session operations away, handled via basic auth and VIA, and possible separate public API / Riku Sarlin 2018-08-13\n* Added contact categories to contact, and ability to limit contacts by category in contact search / Riku Sarlin 2018-08-31\n* Updated DocumentType to contain type, typeSpecifier and type Code. Changed NewRecordData and Record accordingly / Riku Sarlin 2018-10-03\n* Updated to correspond correctly to mapping excel / Joakim Björkgren 2018-12-19\n* Updated implementation status of includeCaseReferences and CaseFileRelation / Tero Arvola 2019-01-30\n* Updated restriction field to not be mandatory for NewCaseData / Tero Arvola 2019-01-30\n* Updated paging / Tero Arvola 2019-02-12\n* Updated publicOnly as not implemented / Tero Arvola 2019-03-07\n* Updated NewCaseData.Status description / Tero Arvola 2019-04-30\n* Updated casing and datatypes (array --> string) for Case and Document schemas / Tero Arvola 2019-05-02\n* Updates on implementation status / Tero Arvola 2019-05-06, 2019-05-07\n* Updated Keyword object for Case.Subject and Record.Subject / Tero Arvola 2019-05-16\n* Added includeFileData option for Documents and DocumentVersions / Tero Arvola 2019-05-22\n* Altered language in Records/{RecordRecno} and Cases/{CaseRecno} description to emphasize document contents only being retrievable by Documents/{DocumentRecno} and DocumentVersions/{DocumentVersionRecno} / Joakim Björkgren 2019-05-24\n* Added Record.Date / Tero Arvola 2019-05-27\n",
+    "description" : "# VAHVA system public API  \nThe API has been designed with the following principles in mind\n* Interface should be SÄHKE2 compliant, i.e support full SÄHKE2 metadata model and enforce mandatory metadata\n* Interface should be usable without changes in all VAHVA installations (VNK VAHVA, VirastoVahva)\n* Installation specific metadata can be used\n* Use component-based schema definitions to make changes easier \n# General usage guidelines\nClient always needs to authenticate with the server and get a session key. Authentication happens with basic authentication with system-specific credentials. \n## General read usage\nReading cases and documents happens in three stages as follows\n* Read case list with GET /api/v1/cases => case metadata\n  * Here API user must be prepared to handle situations where not all data is returned in a single call. This may be the case when maxRows (default is 100) cases is returned with first call. If this happens, further calls with page and maxRows parameters set properly may be required. \n  * Server side is stateless, all state needs to be handled by the client\n* When case is selected, get case details with GET /api/v1/cases/{caseRecno} => case, record and document metadata\n* When a document (or rather, a relevant rendition of a case record) in case is selected, get document contents with GET /api/v1/documents/{documentRecno}\n## General write usage\nCreating new cases always requires the following pieces of information (PUT /api/v1/cases)\n* Technical id of the responsible organization (Contact.recno - either hard coded or fetched with GET /api/v1/contacts)\n* Technical is the responsible person (Contact.recno, see above)\n* Classification code of the new case\n* Language of the case\n* Title of the case\n* Status of the case\n* Information regarding restriction status of the case (such as publicity of the case)\n* Once a case has been created, new records (PUT /api/v1/records) can be added to the case, and new documents (PUT /api/v1/documents) can be added to the record. Records have a number of required pieces of information. They are quite similar to case mandatory information, with classification code replaced by document type.\n## Date formats\nDate format is according to SFS-EN 28601 standard, which is very similar to ISO 8601 format. The format is strictly:\n  * **yyyy-MM-ddThh:mm:sszzz**\n  * example: 2019-05-03T12:17:00+03:00\n  \n  When passing date values in URL query string you need to encode the value. **The plus sign in timezone will not work as it will interpreted as space, so you need to encode it to %2B.**\n  \n# Implementation schedule based on business needs\n* Stage 2a2\n    * Hankeikkuna, LVM Liferay, YJA need to read cases and documents from VNK VAHVA\n        * GET /api/v1/cases/{caseRecno}\n        * GET /api/v1/cases - with some search criteria, others maybe 2b\n        * GET /api/v1/record/{recordRecno}\n    * Buketti needs to insert new cases and documents\n        * POST /api/v1/cases\n        * POST /api/v1/records\n        * POST /api/v1/documents\n        * GET /api/v1/contacts/{contactRecno} - possibly\n        * GET /api/v1/contacts/{contactEmail} - possibly\n        * GET /api/v1/codes/{codeName} - possibly\n    * General needs, most likely\n        * GET /api/v1/records - with at least some search criteria\n* Stage 2b \n    * General integration needs, most likely\n        * GET /api/v1/contacts\n        * GET /api/v1/cases - rest of the search criteria\n        * GET /api/v1/records - rest of the search criteria\n        * PUT /api/v1/cases\n        * PUT /api/v1/records\n        * PUT /api/v1/documents\n        * GET /api/v1/classifications\n        * GET /api/v1/functions/{functionCode}\n        * GET /api/v1/documenttypes/{functionCode}\n# ToDo / Improvement needed on following\n* Find out the actual coding example from VNK, marked as \"TODO\" towards the end of spec\n* Unify interface description language to English, now a little bit mixed English and Finnish\n* It would be beneficial to document mappings to Tieto 360 data model. Tieto?\n# Changes\n* Changed Case, Action, Record and Document timestamps to date-time instead of date / Riku Sarlin 2018-06-14\n* Unified all operations under plural substantives / Riku Sarlin 2018-06-14\n* Added further search parameters to case and record search (all dates, roles, contacts, statuses) based on LVM needs / Riku Sarlin 2018-06-14\n* Added GET /api/v1/session and DELETE /api/v1/session operations and authentication to operations / Riku Sarlin 2018-07-09\n* Some changes to ensure proper performance / Riku Sarlin 2018-07-10\n  * Changed paging to use recnos, lists always returned in recno order. The solution puts some burden on paging to client side - client needs to track \"first\" and \"last\" recnos in paging\n  * GET /api/v1/cases only returns case information - no tasks, records or documents. All case information can then be fetched with GET /api/v1/cases/{caseRecno}\n  * Added separate GET /api/v1/documents/{documentRecno} operation that returns document contents, too (GET /api/v1/records/{recordRecno} now just returns document metadata)\n  * Modified operations so that classification is returned and given by a single string of type \"02.01.01.00\" rather than a complex structured element. GET /api/v1/classifications still returns the structured element, and case GET operations can return it, but by default do not.\n  * Added some sanity checks to GET /api/v1/cases and GET /api/v1/records parameters to ensure proper performance and sensible result set sizes\n* Took /api/v1/session operations away, handled via basic auth and VIA, and possible separate public API / Riku Sarlin 2018-08-13\n* Added contact categories to contact, and ability to limit contacts by category in contact search / Riku Sarlin 2018-08-31\n* Updated DocumentType to contain type, typeSpecifier and type Code. Changed NewRecordData and Record accordingly / Riku Sarlin 2018-10-03\n* Updated to correspond correctly to mapping excel / Joakim Björkgren 2018-12-19\n* Updated implementation status of includeCaseReferences and CaseFileRelation / Tero Arvola 2019-01-30\n* Updated restriction field to not be mandatory for NewCaseData / Tero Arvola 2019-01-30\n* Updated paging / Tero Arvola 2019-02-12\n* Updated publicOnly as not implemented / Tero Arvola 2019-03-07\n* Updated NewCaseData.Status description / Tero Arvola 2019-04-30\n* Updated casing and datatypes (array --> string) for Case and Document schemas / Tero Arvola 2019-05-02\n* Updates on implementation status / Tero Arvola 2019-05-06, 2019-05-07\n* Updated Keyword object for Case.Subject and Record.Subject / Tero Arvola 2019-05-16\n* Added includeFileData option for Documents and DocumentVersions / Tero Arvola 2019-05-22\n* Altered language in Records/{RecordRecno} and Cases/{CaseRecno} description to emphasize document contents only being retrievable by Documents/{DocumentRecno} and DocumentVersions/{DocumentVersionRecno} / Joakim Björkgren 2019-05-24\n* Added Record.Date / Tero Arvola 2019-05-27\n* Update on Language object and Language fields on NewCaseData and NewRecordData objects. Fixed some errors on required fields. / Tero Arvola 2019-08-02\n* Add Category field to NewRecordData. Add recordCategory to Codes. / Tero Arvola 2019-08-28\n* Update POST Record with correct schema references / Tero Arvola 2019-09-05\n",
     "version" : "1.0.0"
   },
   "servers" : [ {
@@ -22,7 +22,7 @@
           "explode" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "caseStatus", "taskStatus", "documentStatus", "documentType", "taskType", "caseType", "otherIdType", "language", "agentRole", "ministry" ]
+            "enum" : [ "agentRole", "caseStatus", "caseType", "documentStatus", "documentType", "formatVersion", "language", "ministries", "otherIdType", "recordCategory", "taskStatus", "taskType" ]
           }
         }, {
           "name" : "lang",
@@ -161,7 +161,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }, {
           "name" : "otherIdType",
@@ -171,12 +174,15 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }, {
           "name" : "role",
           "in" : "query",
-          "description" : "Limit to contacts in this/these role(s). Defaults to empty.",
+          "description" : "Limit to contacts in this/these role(s). Defaults to empty. NOT IMPLEMENTED",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -219,10 +225,7 @@
           "schema" : {
             "type" : "array",
             "items" : {
-              "type" : "array",
-              "items" : {
-                "type" : "string"
-              }
+              "type" : "integer"
             }
           }
         }, {
@@ -654,7 +657,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }, {
           "name" : "otherIdType",
@@ -664,7 +670,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }, {
           "name" : "contact",
@@ -682,7 +691,7 @@
         }, {
           "name" : "subOrganizationOk",
           "in" : "query",
-          "description" : "When searching with organization contacts, if set to true, then we have a hit if record's owning organizaton\nis a suborganization of a contact listed in parameter \"contact\". That is, we can search with LVM\nrecno, and all LVM sub-units would be considered a hit. In effect, this expands the list of contact\nrecnos in search criteria to all sub-organizations. Defaults to false.\n",
+          "description" : "When searching with organization contacts, if set to true, then we have a hit if record's owning organizaton\nis a suborganization of a contact listed in parameter \"contact\". That is, we can search with LVM\nrecno, and all LVM sub-units would be considered a hit. In effect, this expands the list of contact\nrecnos in search criteria to all sub-organizations. Defaults to false. (NOT IMPLEMENTED)\n",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -1194,7 +1203,7 @@
         }
       },
       "post" : {
-        "summary" : "Add document to record",
+        "summary" : "Add document to record (NOT IMPLEMENTED, Documents added through POST Records)",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1956,8 +1965,8 @@
     },
     "/api/v1/Sessiondocumentids/{sessionId}" : {
       "get" : {
-        "summary" : "Fetch session list item document ids so that each file can be fetched separately",
-        "description" : "Fetch session list item document ids by session id (NOT IMPLEMENTED)",
+        "summary" : "Fetch session list item document ids so that each file can be fetched separately (NOT IMPLEMENTED)",
+        "description" : "Fetch session list item document ids by session id",
         "operationId" : "fetchSessionDocumentsIds",
         "parameters" : [ {
           "name" : "sessionId",
@@ -2171,10 +2180,12 @@
         }
       },
       "NewCaseData" : {
+        "required" : [ "ClassificationCode", "Language", "ResponsibleOrganization", "ResponsiblePerson", "Status", "Title" ],
         "type" : "object",
         "properties" : {
           "Language" : {
-            "$ref" : "#/components/schemas/Language"
+            "type" : "string",
+            "description" : "The language recno of the case. You can retrieve the language recno from \"/api/v1/Codes/language\" (Code.Recno)"
           },
           "Title" : {
             "type" : "string",
@@ -2222,11 +2233,16 @@
         "description" : "Information needed to create a case"
       },
       "NewRecordData" : {
+        "required" : [ "Category", "DocumentType", "Language", "Receiver", "ResponsibleOrganization", "ResponsiblePerson", "Restriction", "Status", "Title" ],
         "type" : "object",
         "properties" : {
           "CaseId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Case.recno. Pakollinen, jos asiakirja liitetään asiaan"
+          },
+          "Category" : {
+            "type" : "string",
+            "description" : "Record category (asiakirjan suunta). Recno value from \"/api/v1/Codes/recordCategory\" (Code.Recno)"
           },
           "TaskType" : {
             "$ref" : "#/components/schemas/ActionType"
@@ -2235,7 +2251,8 @@
             "$ref" : "#/components/schemas/DocumentType"
           },
           "Language" : {
-            "$ref" : "#/components/schemas/Language"
+            "type" : "string",
+            "description" : "The language recno of the case. You can retrieve the language recno from \"/api/v1/Codes/language\" (Code.Recno)"
           },
           "Title" : {
             "type" : "string",
@@ -2249,7 +2266,7 @@
           },
           "Receiver" : {
             "type" : "array",
-            "description" : "revceivers of record, identified by VAHVA Contact.recno, role in Agent",
+            "description" : "Receivers of record, identified by VAHVA Contact.recno, role in Agent",
             "items" : {
               "$ref" : "#/components/schemas/Agent"
             }
@@ -2286,13 +2303,14 @@
             "type" : "array",
             "description" : "the documents of the record - can be given at creation time, or later",
             "items" : {
-              "$ref" : "#/components/schemas/Document"
+              "$ref" : "#/components/schemas/NewDocument"
             }
           }
         },
         "description" : "Tiedot joita tarvitaan asiakirjan luomiseen. Asiakirjan luomisen yhteydessä voidaan antaa myös asiakirjan tiedostot, tai ne voidaan ladata myöhemmin\n"
       },
       "NewDocumentData" : {
+        "required" : [ "document", "recordId" ],
         "type" : "object",
         "properties" : {
           "RecordId" : {
@@ -2310,6 +2328,7 @@
         "description" : "Tiedot joita tarvitaan tiedoston/tiedostojen liittämiseen asiakirjaan\n"
       },
       "NewDocument" : {
+        "required" : [ "DocumentContents", "SahkeDocument" ],
         "type" : "object",
         "properties" : {
           "SahkeDocument" : {
@@ -2323,24 +2342,17 @@
         "description" : "SÄHKE2 6.4.2 Tiedosto + tiedoston sisältö"
       },
       "NewSahkeDocument" : {
+        "required" : [ "FileName" ],
         "type" : "object",
         "properties" : {
-          "NativeId" : {
-            "type" : "string",
-            "description" : "SÄHKE2 6.4.1 Identifiointitunnus (VAHVA Document recno)"
-          },
           "UseType" : {
             "type" : "string",
-            "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
+            "description" : "NOT IMPLEMENTED\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
             "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
           },
           "FileName" : {
             "type" : "string",
             "description" : "SÄHKE2 6.4.2.1 (tiedoston) Nimi"
-          },
-          "FilePath" : {
-            "type" : "string",
-            "description" : "SÄHKE2 6.4.2.2 Hakemistopolku"
           },
           "FormatName" : {
             "type" : "string",
@@ -2356,11 +2368,11 @@
           },
           "HashAlgorithm" : {
             "type" : "string",
-            "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi"
+            "description" : "SÄHKE2 6.4.5 Eheystunnisteen algoritmi (NOT IMPLEMENTED)"
           },
           "HashValue" : {
             "type" : "string",
-            "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo"
+            "description" : "SÄHKE2 6.4.6 Eheystunnisteen arvo (NOT IMPLEMENTED)"
           },
           "Encryption" : {
             "type" : "string",
@@ -2393,6 +2405,7 @@
         "description" : "Indicates that transaction was not completed, and the reason for this"
       },
       "Case" : {
+        "required" : [ "action", "agent", "classificationCode", "created", "function", "language", "nativeId", "restriction", "retentionPeriod", "retentionPeriodCalculationGrounds", "retentionReason", "status", "title" ],
         "type" : "object",
         "properties" : {
           "Subject" : {
@@ -2628,20 +2641,21 @@
         "description" : "SÄHKE2 5 Toimenpide. Note that there is no separate \"Task\" entity in P360. \"Task\" is actually two pieces of custom metadata in Document object, namely \"Toimenpiteen nimeke\" (such as \"Kanslaiskirjeen vastaanottaminen\" - SÄHKE2 5.3 ) and \"Toimenpiteen tyyppi\" (such as \"06.04.07.00\" - SÄHKE2 5.6). This has a number of consequences * Each Action only has one Record * There can be multiple Actions of the same action type in Case * Some Action data is actually Record data (such as agent) * Only mandatory SÄHKE2 fields are used\n"
       },
       "Record" : {
+        "required" : [ "authenticity", "created", "function", "language", "nativeId", "restriction", "status", "title", "type" ],
         "type" : "object",
         "properties" : {
-          "Subject" : {
+          "subject" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/Keyword"
             }
           },
-          "Created" : {
+          "created" : {
             "type" : "string",
             "description" : "SÄHKE 2.2.1 (asiakirjan) Avattu/laadittu pvm. Päivämäärä jolloin asiakirja on luotu järjestelmään, ei muokattavissa.",
             "format" : "date-time"
           },
-          "Date" : {
+          "date" : {
             "type" : "string",
             "description" : "Asiakirjan päivämäärä. Manuaalisesti syötettävä tieto, ei pakollinen. (NOT IMPLEMENTED FOR POST/PUT)",
             "format" : "date-time"
@@ -2654,12 +2668,12 @@
               "format" : "date-time"
             }
           },
-          "Sent" : {
+          "sent" : {
             "type" : "string",
             "description" : "SÄHKE 2.2.3 (asiakirjan) Lähetetty pvm (NOT IMPLEMENTED)",
             "format" : "date-time"
           },
-          "Modified" : {
+          "modified" : {
             "type" : "string",
             "description" : "SÄHKE 2.2.4 (asiakirjan) Muokattu pvm",
             "format" : "date-time"
@@ -2680,140 +2694,140 @@
               "format" : "date-time"
             }
           },
-          "NativeId" : {
+          "nativeId" : {
             "type" : "string",
             "description" : "SÄHKE 2.3 (asiakirjan) Identifiointitunnus, VAHVA document.recno"
           },
-          "OtherId" : {
+          "otherId" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/OtherId"
             }
           },
-          "Language" : {
+          "language" : {
             "$ref" : "#/components/schemas/Language"
           },
-          "Description" : {
+          "description" : {
             "type" : "string",
             "description" : "SÄHKE 2.5 (asiakirjan) Kuvaus (NOT IMPLEMENTED)"
           },
-          "Abstract" : {
+          "abstract" : {
             "type" : "string",
             "description" : "SÄHKE 2.5.1 (asiakirjan) Tiivistelmä (NOT IMPLEMENTED)"
           },
-          "Restriction" : {
+          "restriction" : {
             "$ref" : "#/components/schemas/RestrictionInfo"
           },
-          "Title" : {
+          "title" : {
             "type" : "string",
             "description" : "SÄHKE 2.7 (asiakirjan) Nimike"
           },
-          "StorageLocation" : {
+          "storageLocation" : {
             "type" : "string",
             "description" : "SÄHKE2 2.9 (asiakirjan) Sijaintipaikka"
           },
-          "RecordRelations" : {
+          "recordRelations" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/RecordRelation"
             }
           },
-          "RetentionPeriod" : {
+          "retentionPeriod" : {
             "type" : "integer",
             "description" : "SÄHKE2 2.11.1 Säilytysajan pituus"
           },
-          "RetentionReason" : {
+          "retentionReason" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.2 Säilytysajan peruste"
           },
-          "RetentionPeriodEnd" : {
+          "retentionPeriodEnd" : {
             "type" : "string",
             "description" : "SÄHKE2 2.11.3 Säilytysajan päättymisajankohta"
           },
-          "RetentionPeriodCalculationGrounds" : {
+          "retentionPeriodCalculationGrounds" : {
             "$ref" : "#/components/schemas/RetentionPeriodCalculationGrounds"
           },
-          "Status" : {
+          "status" : {
             "$ref" : "#/components/schemas/DocumentStatus"
           },
-          "Function" : {
+          "function" : {
             "type" : "string",
             "description" : "SÄHKE2 2.13 Tehtävä"
           },
-          "Type" : {
+          "type" : {
             "$ref" : "#/components/schemas/DocumentType"
           },
-          "Accepted" : {
+          "accepted" : {
             "type" : "string",
             "description" : "SÄHKE2 4.1.1 Hyväksytty pvm (NOT IMPLEMENTED)",
             "format" : "date"
           },
-          "Gathered" : {
+          "gathered" : {
             "type" : "string",
             "description" : "SÄHKE2 4.1.2 Koottu pvm (NOT IMPLEMENTED)",
             "format" : "date"
           },
-          "Valid" : {
+          "valid" : {
             "$ref" : "#/components/schemas/TimePeriod"
           },
-          "Authenticity" : {
+          "authenticity" : {
             "$ref" : "#/components/schemas/Authenticity"
           },
-          "SignatureDescription" : {
+          "signatureDescription" : {
             "type" : "string",
             "description" : "SÄHKE2 4.3 Asiakirjan sähköinen allekirjoitus (NOT IMPLEMENTED)"
           },
-          "Coverage" : {
+          "coverage" : {
             "$ref" : "#/components/schemas/Coverage"
           },
-          "Audience" : {
+          "audience" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 4.5 Kohdeyleisö (NOT IMPLEMENTED)"
             }
           },
-          "Source" : {
+          "source" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 4.6 Lähde (NOT IMPLEMENTED)"
             }
           },
-          "Rights" : {
+          "rights" : {
             "type" : "array",
             "items" : {
               "type" : "string",
               "description" : "SÄHKE2 4.7 Oikeudet (NOT IMPLEMENTED)"
             }
           },
-          "ProtectionClass" : {
+          "protectionClass" : {
             "type" : "string",
             "description" : "SÄHKE2 4.9 Suojeluluokka"
           },
-          "AlternativeTitle" : {
+          "alternativeTitle" : {
             "type" : "string",
             "description" : "SÄHKE2 4.10 Vaihtoehtoinen nimike"
           },
-          "Version" : {
+          "version" : {
             "type" : "string",
             "description" : "SÄHKE2 4.11 Versio"
           },
-          "Document" : {
+          "document" : {
             "type" : "array",
             "description" : "SÄHKE2 6.4.2 Tiedosto",
             "items" : {
               "$ref" : "#/components/schemas/Document"
             }
           },
-          "Custom" : {
+          "custom" : {
             "type" : "array",
             "description" : "SÄHKE2 2.8 (asiakirjan) Organisaatiokohtaiset metatiedot  (NOT IMPLEMENTED)",
             "items" : {
               "$ref" : "#/components/schemas/CustomMetadata"
             }
           },
-          "Agent" : {
+          "agent" : {
             "type" : "array",
             "description" : "SÄHKE2 2.14 Toimija",
             "items" : {
@@ -2851,6 +2865,7 @@
         "description" : "SÄHKE2 4.4 Kattavauus (NOT IMPLEMENTED)"
       },
       "Authenticity" : {
+        "required" : [ "checker", "date", "description" ],
         "type" : "object",
         "properties" : {
           "Checker" : {
@@ -2870,6 +2885,7 @@
         "description" : "SÄHKE2 4.2 Asiakirjan alkuperäisyys ja eheys todettu"
       },
       "TimePeriod" : {
+        "required" : [ "start" ],
         "type" : "object",
         "properties" : {
           "Start" : {
@@ -2948,6 +2964,7 @@
         "description" : "SÄHKE2 4.8 Suhde (NOT IMPLEMENTED)"
       },
       "SahkeDocument" : {
+        "required" : [ "(FormatVersion)", "FormatName", "HashAlgorithm", "HashValue", "NativeId", "UseType" ],
         "type" : "object",
         "properties" : {
           "NativeId" : {
@@ -2956,8 +2973,7 @@
           },
           "UseType" : {
             "type" : "string",
-            "description" : "useType:\n * `Arkisto` - Arkistomuoto\n * `Natiivi` - Asiakirjan alkuperäinen muoto\n * `Julkaisu` - Asiakirjan julkaisumuoto\n",
-            "enum" : [ "Arkisto", "Natiivi", "Julkaisu" ]
+            "description" : "Tiedoston käyttötyyppi"
           },
           "FileName" : {
             "type" : "string",
@@ -2971,9 +2987,9 @@
             "type" : "string",
             "description" : "SÄHKE2 6.4.3.1 (formaatin) Nimi"
           },
-          "formatVersion" : {
-            "type" : "string",
-            "description" : "SÄHKE2 6.4.3.2 (formaatin) Versio (NOT IMPLEMENTED)"
+          "FormatVersion" : {
+            "type" : "integer",
+            "description" : "SÄHKE2 6.4.3.2 (formaatin) Versio, tekninen id"
           },
           "mediumId" : {
             "type" : "string",
@@ -2995,6 +3011,7 @@
         "description" : "SÄHKE2 6.4.2 Tiedosto"
       },
       "Document" : {
+        "required" : [ "documentContents", "sahkeDocument" ],
         "type" : "object",
         "properties" : {
           "SahkeDocument" : {
@@ -3043,6 +3060,7 @@
         "description" : "SÄHKE2 3.2 Sähköinen tiedoksianto (NOT IMPLEMENTED)"
       },
       "ClassificationScheme" : {
+        "required" : [ "mainFunctionCode", "mainFunctionTitle" ],
         "type" : "object",
         "properties" : {
           "MainFunction" : {
@@ -3118,6 +3136,7 @@
         "description" : "SÄHKE2 2.10 Suhde"
       },
       "Agent" : {
+        "required" : [ "role" ],
         "type" : "object",
         "properties" : {
           "Role" : {
@@ -3138,6 +3157,7 @@
         "description" : "SÄHKE2 2.14 Toimija + laajennettu OtherId -tiedolla"
       },
       "CustomMetadata" : {
+        "required" : [ "name", "type", "value" ],
         "type" : "object",
         "properties" : {
           "Name" : {
@@ -3202,6 +3222,7 @@
         }
       },
       "AccessRight" : {
+        "required" : [ "name", "role" ],
         "type" : "object",
         "properties" : {
           "Name" : {
@@ -3219,6 +3240,7 @@
         }
       },
       "RestrictionInfo" : {
+        "required" : [ "containsPersonalData", "publicityClass" ],
         "type" : "object",
         "properties" : {
           "PublicityClass" : {
@@ -3304,7 +3326,7 @@
       },
       "Language" : {
         "type" : "string",
-        "description" : "SÄHKE2 2.4 Kieli, koodiston \"language\" mukaiset vaihtoehdot. VNK-esimerkki suomeksi\n* 'fi' - suomi\n* 'sv' - ruotsi\n* 'en' - englanti\n* 'fr' - ranska\n* 'de' - saksa\n* 'ru' - venäjä\n* 'bg' - bulgaria\n* 'et' - viro\n* 'es' - espanja\n* 'nl' - hollangi\n* 'ga' - irlanti\n* 'it' - italia\n* 'el' - kreikka\n* 'lv' - liettua\n* 'mt' - malta\n* 'pl' - puola\n* 'ro' - romania\n* 'sk' - slovakia\n* 'sl' - slovenia\n* 'da' - tanska\n* 'cs' - tsekki\n* 'se' - pohjois-aame\n"
+        "description" : "SÄHKE2 2.4 Kieli, koodiston \"language\" (/api/v1/Codes/language) mukaiset vaihtoehdot (Code.Description)\n* 'fi' - suomi\n* 'sv' - ruotsi\n* 'en' - englanti\n"
       },
       "CaseStatus" : {
         "type" : "string",
@@ -3319,6 +3341,7 @@
         "description" : "JHS191 6.3 Käsittelyprosessin tila. Coded value \"actionStatus\". VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* \"Avattu\"\n* \"Vireillä\"\n* \"Valmistelussa\"\n* \"Ratkaistu\" \n* \"Toimitettu tiedoksi\"\n* \"Toimeenpantavana\" \n* \"Muutoksenhaku\"\n* \"Seurannassa\"\n* \"Päätetty\" \n* \"Avattu uudelleen\" \n* \"Siirretty\" \n* \"Hävitetty\"\n"
       },
       "DocumentType" : {
+        "required" : [ "typeCode" ],
         "type" : "object",
         "properties" : {
           "Type" : {
@@ -3356,6 +3379,7 @@
         "description" : "Technical ID (recno) in VAHVA (NOT IMPLEMENTED)"
       },
       "Session" : {
+        "required" : [ "changedTime", "extra", "id", "place", "plannedStart", "removed", "sessionIdentifier", "status" ],
         "type" : "object",
         "properties" : {
           "sessionId" : {
@@ -3375,7 +3399,7 @@
             "maxLength" : 100,
             "type" : "string",
             "description" : "Place of the session",
-            "example" : "[Helsinki, Naantali]"
+            "example" : "[\"Helsinki\",\"Naantali\"]"
           },
           "Type" : {
             "$ref" : "#/components/schemas/SessionType"
@@ -3406,6 +3430,7 @@
         "description" : "(NOT IMPLEMENTED)\n"
       },
       "ListItem" : {
+        "required" : [ "caseId", "caseTypeName", "contents", "listId", "listStatus", "minister", "ministryName", "ministryShortName", "presenter", "proposal", "sessionId", "titleFi", "titleSv" ],
         "type" : "object",
         "properties" : {
           "CaseId" : {
@@ -3582,7 +3607,7 @@
         "description" : "(NOT IMPLEMENTED)\n"
       },
       "ListDocument" : {
-        "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
+        "required" : [ "containsPersonalData", "documentFormatType", "documentId", "documentTitle", "documentType", "documentTypeNameFi", "documentTypeNameSv", "fileName", "lang", "listId", "ordinal" ],
         "type" : "object",
         "properties" : {
           "DocumentType" : {
