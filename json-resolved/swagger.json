@@ -2336,7 +2336,8 @@
           },
           "DocumentContents" : {
             "type" : "string",
-            "format" : "binary"
+            "description" : "Base64 encoded string of file's byte array",
+            "format" : "base64"
           }
         },
         "description" : "SÄHKE2 6.4.2 Tiedosto + tiedoston sisältö"
