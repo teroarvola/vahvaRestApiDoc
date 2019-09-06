@@ -2313,11 +2313,11 @@
         "required" : [ "document", "recordId" ],
         "type" : "object",
         "properties" : {
-          "RecordId" : {
+          "recordId" : {
             "type" : "string",
             "description" : "SÄHKE2 2.3 (asian) Identifiointitunnus, VAHVA Document.recno."
           },
-          "Document" : {
+          "document" : {
             "type" : "array",
             "description" : "the document(s) to add to the record",
             "items" : {
