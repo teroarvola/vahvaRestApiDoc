@@ -1403,9 +1403,9 @@
             "type" : "boolean"
           }
         }, {
-          "name" : "createdFrom",
+          "name" : "CreationDateFrom",
           "in" : "query",
-          "description" : "The lower limit for Contact.CreatedDate. Given in seconds. Defaults to none.",
+          "description" : "The lower limit for Contact.CreatedDate. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded. Defaults to none.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -1414,9 +1414,9 @@
             "format" : "date-time"
           }
         }, {
-          "name" : "createdTo",
+          "name" : "CreationDateTo",
           "in" : "query",
-          "description" : "The upper limit for Contact.CreatedDate. Given in seconds. Defaults to none.",
+          "description" : "The upper limit for Contact.CreatedDate. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded. Defaults to none.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -1425,9 +1425,9 @@
             "format" : "date-time"
           }
         }, {
-          "name" : "modifiedFrom",
+          "name" : "ModificationDateFrom",
           "in" : "query",
-          "description" : "The lower limit for Contact.ModifiedDate. Given in seconds. Defaults to none.",
+          "description" : "The lower limit for Contact.ModifiedDate. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded. Defaults to none.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -1436,9 +1436,9 @@
             "format" : "date-time"
           }
         }, {
-          "name" : "modifiedTo",
+          "name" : "ModificationDateTo",
           "in" : "query",
-          "description" : "The upper limit for Contact.ModifiedDate. Given in seconds. Defaults to none.",
+          "description" : "The upper limit for Contact.ModifiedDate. Date format is YYYY-MM-DDTHH:MM:SSZ. The value should be URL encoded. Defaults to none.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -1475,6 +1475,16 @@
           "explode" : true,
           "schema" : {
             "type" : "boolean"
+          }
+        }, {
+          "name" : "structureNumber",
+          "in" : "query",
+          "description" : "Structure number of the contact (VahvaContact.StructureNumber). You can use '%' as a wildcard. Structure number defines the contact's position in organization hierarchy, the format is recnos separated with 'M' (example: 200001M200002M).\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
