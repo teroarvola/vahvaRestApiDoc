@@ -2192,7 +2192,7 @@
       },
       "VahvaContactCategory" : {
         "type" : "string",
-        "description" : "Kontaktin kategoria. Koodiston \"contactCategory\" mukainen kooditus. VNK-esimerkki suomeksi\nTODO selvitä oikea koodaus esimerkkiin\n* '1' - Poliitikko\n* ...\n"
+        "description" : "Kontaktin kategoria. Koodiston \"contactCategory\" mukainen kooditus. VNK-esimerkki suomeksi\n* '1' - Sisäinen\n* '4' - Poliittinen puolue\n* '5' - Palvelu\n* '10' - Poliitikko\n* '16' - Toimielin - ei toiminta-aikaa\n* '20' - Ministeri\n* '21' - Osastopäällikkö\n* '22' - Ministerin sihteeri\n* '50001' - Toimielin\n* '50002' - Johtokunta\n* '50003' - Valtuusto\n"
       },
       "VahvaAddressType" : {
         "type" : "string",
