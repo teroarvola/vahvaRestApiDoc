@@ -2587,7 +2587,7 @@
           },
           "Action" : {
             "type" : "array",
-            "description" : "Asiaan liittyvät toimenpiteet (NOT IMPLEMENTED)",
+            "description" : "Asiaan liittyvät toimenpiteet",
             "items" : {
               "$ref" : "#/components/schemas/Action"
             }
