@@ -129,7 +129,7 @@
     "/api/v1/Cases" : {
       "get" : {
         "summary" : "Return cases based on search criteria. \n",
-        "description" : "Note that this operation ONLY RETURNS CASE INFORMATION - no tasks, records or documents are returned to ensure proper performance. Further information can then be fetched by case using GET /api/v1/cases/{caseRecno}. Results are always returned in recno order, that is, by creation timestamp. By default the set is in ascending order, but parameter reverseSortOrder can be used to change the order to descending.\nThe following sanity checks are conducted on search criteria, breaking these rules will result in 405 return code with description. If effect, the API allow searching cases at maximum one year at a time, and is always limited by some contact.\n* at least CaseNumber, Contact or ResponsibleOrganization is required\n* for any date parameter, to and from dates (if both given) may not be further than one year apart\n* for any date parameter, if to date is given alone, it may not be in the future\n",
+        "description" : "Note that this operation ONLY RETURNS CASE INFORMATION - no tasks, records or documents are returned to ensure proper performance. Further information can then be fetched by case using GET /api/v1/cases/{caseRecno}. Results are always returned in recno order, that is, by creation timestamp. By default the set is in ascending order, but parameter reverseSortOrder can be used to change the order to descending.\nThe following sanity checks are conducted on search criteria, breaking these rules will result in 405 return code with description. If effect, the API allow searching cases at maximum one year at a time, and is always limited by some contact.\n* at least CaseNumber, Contact (usually the responsible organization or responsible person) or Ministry is required\n* for any date parameter, to and from dates (if both given) may not be further than one year apart\n* for any date parameter, if to date is given alone, it may not be in the future\n",
         "parameters" : [ {
           "name" : "title",
           "in" : "query",
@@ -178,6 +178,16 @@
             "items" : {
               "type" : "string"
             }
+          }
+        }, {
+          "name" : "ministry",
+          "in" : "query",
+          "description" : "Ministry abbreviation to search on. Results are filtered by given ministry. Defaults to empty. Either contact or ministry must be provided. Possible values can be checked with providing faulty or empty input, for example /api/v1/cases?ministry=\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "role",
