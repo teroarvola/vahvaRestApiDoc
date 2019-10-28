@@ -180,16 +180,6 @@
             }
           }
         }, {
-          "name" : "ministry",
-          "in" : "query",
-          "description" : "Ministry abbreviation to search on. Results are filtered by given ministry. Defaults to empty. Either contact or ministry must be provided. Possible values can be checked with providing faulty or empty input, for example /api/v1/cases?ministry=\n",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
           "name" : "role",
           "in" : "query",
           "description" : "Limit to contacts in this/these role(s). Defaults to empty. NOT IMPLEMENTED",
@@ -201,6 +191,16 @@
             "items" : {
               "$ref" : "#/components/schemas/AgentRole"
             }
+          }
+        }, {
+          "name" : "ministry",
+          "in" : "query",
+          "description" : "Ministry abbreviation to search on. Results are filtered by given ministry. Defaults to empty. Either contact or ministry must be provided. Possible values can be checked with providing faulty or empty input, for example /api/v1/cases?ministry=\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "contact",
