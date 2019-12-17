@@ -1243,7 +1243,7 @@
         }
       },
       "post" : {
-        "summary" : "Add document to record (NOT IMPLEMENTED, Documents added through POST Records)",
+        "summary" : "Add document to record",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3811,7 +3811,33 @@
             }
           }
         },
-        "example" : "{\"codes\":[{\"lang\":\"fi\",\"code\":\"vahvaCaseNumber\",\"description\":\"Vahvan asianumero\"},{\"lang\":\"fi\",\"code\":\"vahvaDocumentNumber\",\"description\":\"Vahvan asiakirjanumero\"},{\"lang\":\"fi\",\"code\":\"eduskuntaTunnus\",\"description\":\"Asian edustkuntatunniste\"},{\"lang\":\"fi\",\"code\":\"vahvaContactRecno\",\"description\":\"Vahvan kontaktin tekninen tunniste\"},{\"lang\":\"fi\",\"code\":\"hankeikkunaKohdeTunnus\",\"description\":\"Hankeikkunan kohteen tekninen tunniste\"},{\"lang\":\"fi\",\"code\":\"unspecified\",\"description\":\"Muu tunniste\"}]}"
+        "example" : {
+          "codes" : [ {
+            "lang" : "fi",
+            "code" : "vahvaCaseNumber",
+            "description" : "Vahvan asianumero"
+          }, {
+            "lang" : "fi",
+            "code" : "vahvaDocumentNumber",
+            "description" : "Vahvan asiakirjanumero"
+          }, {
+            "lang" : "fi",
+            "code" : "eduskuntaTunnus",
+            "description" : "Asian edustkuntatunniste"
+          }, {
+            "lang" : "fi",
+            "code" : "vahvaContactRecno",
+            "description" : "Vahvan kontaktin tekninen tunniste"
+          }, {
+            "lang" : "fi",
+            "code" : "hankeikkunaKohdeTunnus",
+            "description" : "Hankeikkunan kohteen tekninen tunniste"
+          }, {
+            "lang" : "fi",
+            "code" : "unspecified",
+            "description" : "Muu tunniste"
+          } ]
+        }
       },
       "body" : {
         "required" : [ "caseData" ],
@@ -3895,14 +3921,6 @@
           }
         }
       },
-      "inline_response_200_3_documentIds" : {
-        "type" : "object",
-        "properties" : {
-          "documentId" : {
-            "$ref" : "#/components/schemas/TechnicalId"
-          }
-        }
-      },
       "inline_response_200_3" : {
         "type" : "object",
         "properties" : {
@@ -3913,25 +3931,6 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/inline_response_200_3_documentIds"
-            }
-          }
-        }
-      },
-      "inline_response_200_4_listItems" : {
-        "type" : "object",
-        "properties" : {
-          "listItemId" : {
-            "$ref" : "#/components/schemas/TechnicalId"
-          },
-          "caseNumber" : {
-            "type" : "string",
-            "description" : "Case number",
-            "example" : "VN/30/2018"
-          },
-          "documentIds" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/TechnicalId"
             }
           }
         }
@@ -3973,6 +3972,33 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/SubFunction"
+            }
+          }
+        }
+      },
+      "inline_response_200_3_documentIds" : {
+        "type" : "object",
+        "properties" : {
+          "documentId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          }
+        }
+      },
+      "inline_response_200_4_listItems" : {
+        "type" : "object",
+        "properties" : {
+          "listItemId" : {
+            "$ref" : "#/components/schemas/TechnicalId"
+          },
+          "caseNumber" : {
+            "type" : "string",
+            "description" : "Case number",
+            "example" : "VN/30/2018"
+          },
+          "documentIds" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TechnicalId"
             }
           }
         }
