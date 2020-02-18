@@ -669,7 +669,7 @@
         }, {
           "name" : "title",
           "in" : "query",
-          "description" : "Document.Title. Returns results that match record title. Use '%' as wildcard.  Defaults to empty. Needs to be at least 3 characters long.",
+          "description" : "Record.Title. Returns results that match record title. Use '%' as wildcard.  Defaults to empty. Needs to be at least 3 characters long.",
           "required" : false,
           "style" : "form",
           "explode" : true,
