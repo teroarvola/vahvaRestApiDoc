@@ -2463,8 +2463,9 @@
         "required" : [ "action", "agent", "classificationCode", "created", "function", "language", "nativeId", "restriction", "retentionPeriod", "retentionPeriodCalculationGrounds", "retentionReason", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "Subject" : {
+          "subject" : {
             "type" : "array",
+            "description" : "NOT IMPLEMENTED",
             "items" : {
               "$ref" : "#/components/schemas/Keyword"
             }
@@ -2701,6 +2702,7 @@
         "properties" : {
           "subject" : {
             "type" : "array",
+            "description" : "NOT IMPLEMENTED",
             "items" : {
               "$ref" : "#/components/schemas/Keyword"
             }
