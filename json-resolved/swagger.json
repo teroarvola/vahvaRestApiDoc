@@ -669,7 +669,7 @@
         }, {
           "name" : "role",
           "in" : "query",
-          "description" : "Limit to contacts in this/these role(s). Defaults to empty.",
+          "description" : "Limit to contacts in this/these role(s). Defaults to empty. (NOT IMPLEMENTED)",
           "required" : false,
           "style" : "form",
           "explode" : true,
