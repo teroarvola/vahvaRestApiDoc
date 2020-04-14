@@ -3832,25 +3832,36 @@
             "enum" : [ "Read", "Insert", "Edit", "Delete" ]
           },
           "Grant" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Grant permissions"
           },
           "ViewFile" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "View file (for Record)"
           },
           "InsertFile" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Insert file (for Record)"
           },
           "ModifyFile" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Modify file (for Record)"
           },
           "InsertRev" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Insert revision (for Record)"
           },
           "ModifyRev" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Modify revision (for Record)"
           },
           "InsertDoc" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "Add Record (for Case)"
+          },
+          "Reference" : {
+            "type" : "string",
+            "description" : "Reference text which will be displayed in VAHVA P360 UI next to the permission. If left empty, default text \"S2 REST API\" will be used."
           }
         },
         "description" : "Permission / käyttöoikeus. Either AccessGroup or ContactExternalId needs to be defined."
