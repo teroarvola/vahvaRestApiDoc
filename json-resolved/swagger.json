@@ -3820,7 +3820,7 @@
         "properties" : {
           "AccessGroup" : {
             "type" : "string",
-            "description" : "Access group technical ID (recno). This needs to be checked from the VAHVA P360 system."
+            "description" : "Access group name or technical ID (recno). This needs to be checked from the VAHVA P360 system."
           },
           "ContactExternalId" : {
             "type" : "string",
