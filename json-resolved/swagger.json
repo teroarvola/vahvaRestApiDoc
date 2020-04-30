@@ -391,6 +391,16 @@
             "type" : "boolean"
           }
         }, {
+          "name" : "includeActionDetails",
+          "in" : "query",
+          "description" : "Whether to include Action and Record details in results. Defaults to false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
           "name" : "publicOnly",
           "in" : "query",
           "description" : "Whether to to return publishable information only. Defaults to false. NOT IMPLEMENTED",
